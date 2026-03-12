@@ -1,0 +1,88 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { toNodeHandler } from 'better-auth/node';
+import { createAuth, getMongoClient } from './config/auth.js';
+import settingsRoutes from './routes/settingsRoutes.js';
+import enquiryRoutes from './routes/enquiryRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import connectDB from './config/db.js';
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Initialize Better Auth
+const auth = createAuth();
+
+// Initialize admin user on startup
+async function initializeAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL?.replace(/"/g, '');
+  const adminPassword = process.env.ADMIN_PASSWORD?.replace(/"/g, '');
+  
+  if (!adminEmail || !adminPassword) {
+    console.log('Skipping admin initialization - credentials not set');
+    return;
+  }
+  
+  try {
+    const client = await getMongoClient();
+    const db = client.db();
+    const usersCollection = db.collection('user');
+    
+    const existingUser = await usersCollection.findOne({ email: adminEmail });
+    
+    if (!existingUser) {
+      console.log('Creating admin user...');
+      await auth.api.signUpEmail({
+        body: {
+          email: adminEmail,
+          password: adminPassword,
+          name: 'Admin'
+        }
+      });
+      // Explicitly set role for newly created admin via API
+      await usersCollection.updateOne({ email: adminEmail }, { $set: { role: 'admin' } });
+      console.log('✓ Admin user created:', adminEmail);
+    } else if (existingUser.role !== 'admin') {
+      console.log('Updating existing user to admin status...');
+      await usersCollection.updateOne({ email: adminEmail }, { $set: { role: 'admin' } });
+      console.log('✓ Admin role assigned to:', adminEmail);
+    } else {
+      console.log('✓ Admin user already exists with correct role');
+    }
+  } catch (error) {
+    console.error('Error initializing admin:', error.message);
+  }
+}
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
+
+// Better Auth routes (must be before express.json())
+app.all("/api/auth/*", toNodeHandler(auth));
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Routes
+app.use('/api/settings', settingsRoutes);
+app.use('/api/enquiries', enquiryRoutes);
+app.use('/api/users', userRoutes);
+
+app.get('/', (_req, res) => {
+  res.json({ message: 'UpDownLive API is running' });
+});
+
+app.listen(PORT, async () => {
+  console.log(`Server running on port ${PORT}`);
+  await connectDB();
+  await initializeAdmin();
+});

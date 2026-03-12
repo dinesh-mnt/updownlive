@@ -1,0 +1,148 @@
+"use client";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Building2, MapPin, Phone, Mail, Save, Loader2, Info } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/Card";
+import { useToast } from "@/hooks/use-toast";
+
+interface GeneralInfo {
+  companyName: string;
+  officeAddress: string;
+  companyAddress: string;
+  phone: string;
+  email: string;
+  businessHours: string;
+}
+
+const DEFAULT_INFO: GeneralInfo = {
+  companyName: '',
+  officeAddress: '',
+  companyAddress: '',
+  phone: '',
+  email: '',
+  businessHours: '',
+};
+
+export default function GeneralInformation() {
+  const { toast } = useToast();
+  const [info, setInfo] = useState<GeneralInfo>(DEFAULT_INFO);
+  const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const res = await axios.get(`${apiUrl}/settings/general-info`);
+        if (res.data?.info) {
+          setInfo(prev => ({ ...prev, ...res.data.info }));
+        }
+      } catch (err) {
+        console.error('General info fetch issue:', err);
+        toast({ variant: "destructive", description: 'Failed to load general information.' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInfo();
+  }, []);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      await axios.post(`${apiUrl}/settings/general-info`, { info });
+      toast({ variant: "success" as any, description: 'General information updated successfully.' });
+    } catch (err) {
+      console.error('Error saving general info:', err);
+      toast({ variant: "destructive", description: 'Error saving general information.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setInfo({ ...info, [e.target.name]: e.target.value });
+  };
+
+  if (loading) return null;
+
+  const inputClass =
+    "w-full bg-white border border-brand-border text-brand-black px-4 py-3 rounded-xl focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-medium";
+
+  const fields: { name: keyof GeneralInfo; label: string; icon: React.ElementType; placeholder: string; type?: string; textarea?: boolean }[] = [
+    { name: 'companyName', label: 'Company Name', icon: Building2, placeholder: 'UpDownLive Ltd.' },
+    { name: 'officeAddress', label: 'Office Address', icon: MapPin, placeholder: '123 Financial District, New York, NY 10004', textarea: true },
+    { name: 'companyAddress', label: 'Company / Registered Address', icon: MapPin, placeholder: '456 Corporate Park, London, EC2V 7HH', textarea: true },
+    { name: 'phone', label: 'Phone Number', icon: Phone, placeholder: '+1 (555) 123-4567' },
+    { name: 'email', label: 'Contact Email', icon: Mail, placeholder: 'support@updownlive.com' },
+    { name: 'businessHours', label: 'Business Hours', icon: Info, placeholder: 'Mon–Fri 8:00 AM – 6:00 PM EST' },
+  ];
+
+  return (
+    <>
+      <div className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-brand-black mb-2 tracking-tight">General Information</h1>
+        <p className="text-brand-gray text-lg">
+          Manage your company's contact details. These are displayed on the public Contact page.
+        </p>
+      </div>
+
+      <Card className="rounded-3xl border-brand-border shadow-sm">
+        <CardHeader className="border-b border-brand-border bg-brand-light/50 rounded-t-3xl px-8 py-6">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold">
+            <Building2 size={22} className="text-brand-blue" /> Company Contact Details
+          </CardTitle>
+          <CardDescription>
+            These fields are shown on the website's Contact page under Office & Company Information.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="p-8">
+          <div className="bg-brand-blue/5 border border-brand-blue/20 rounded-2xl p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {fields.map(field => (
+              <div key={field.name} className={field.textarea ? 'lg:col-span-2' : ''}>
+                <label className="flex items-center gap-2 text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">
+                  <field.icon size={14} className="text-brand-blue" /> {field.label}
+                </label>
+                {field.textarea ? (
+                  <textarea
+                    name={field.name}
+                    value={info[field.name]}
+                    onChange={handleChange}
+                    rows={2}
+                    className={`${inputClass} resize-none`}
+                    placeholder={field.placeholder}
+                  />
+                ) : (
+                  <input
+                    type={field.type || 'text'}
+                    name={field.name}
+                    value={info[field.name]}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder={field.placeholder}
+                  />
+                )}
+              </div>
+            ))}
+
+            <div className="flex lg:col-span-2 justify-end mt-2">
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="bg-brand-blue text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-red transition-colors shadow-lg shadow-brand-blue/20 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto justify-center h-[50px]"
+              >
+                {isSaving ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <><Save size={18} /> Save Information</>
+                )}
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+}

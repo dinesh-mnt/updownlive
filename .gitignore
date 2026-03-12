@@ -1,0 +1,177 @@
+# ===================================
+# Node.js & NPM
+# ===================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Package manager lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===================================
+# Environment Variables
+# ===================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# ===================================
+# Logs & Runtime Data
+# ===================================
+logs/
+*.log
+error.log
+full_error.txt
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ===================================
+# Build Outputs & Cache
+# ===================================
+build/
+dist/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.turbo/
+*.tsbuildinfo
+
+# ===================================
+# Frontend (Next.js) Specific
+# ===================================
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/.vercel/
+frontend/.turbo/
+
+# ===================================
+# Backend Specific
+# ===================================
+backend/uploads/
+backend/public/uploads/
+backend/storage/
+# ===================================
+# Testing & Coverage
+# ===================================
+coverage/
+*.lcov
+.nyc_output/
+junit.xml
+test-results/
+
+# ===================================
+# OS Generated Files
+# ===================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===================================
+# IDE & Editor Files
+# ===================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ===================================
+# Temporary & Backup Files
+# ===================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# ===================================
+# Database Files
+# ===================================
+*.sqlite
+*.sqlite3
+*.db
+
+# ===================================
+# Security & Certificates
+# ===================================
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ===================================
+# Cache Directories
+# ===================================
+.npm/
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+# ===================================
+# Deployment & Cloud
+# ===================================
+.vercel/
+.serverless/
+.fusebox/
+.dynamodb/
+
+# ===================================
+# Development Tools
+# ===================================
+.grunt/
+bower_components/
+jspm_packages/
+web_modules/
+.lock-wscript
+
+# ===================================
+# Archives & Compressed Files
+# ===================================
+*.tgz
+*.tar.gz
+*.zip
+*.rar
+
+# ===================================
+# Local Development
+# ===================================
+.local/
+local.json
+.node_repl_history
+
+# ===================================
+# Storybook
+# ===================================
+.out/
+.storybook-out/
+
+# ===================================
+# Miscellaneous
+# ===================================
+lib-cov/
+check_err.js
