@@ -107,6 +107,9 @@ export default function RegisterPage() {
       // Check role from registration response
       const isAdmin = (data.user as any)?.role === "admin";
       
+      // Wait for cookies to be set properly
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Force page reload for reliable cookie setting
       if (isAdmin) {
         window.location.href = "/admin/dashboard";

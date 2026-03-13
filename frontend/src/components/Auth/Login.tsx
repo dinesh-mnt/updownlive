@@ -115,10 +115,11 @@ export default function LoginPage() {
       }
 
       // Wait for cookies to be set properly
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Use router.push instead of window.location for better Next.js handling
-      router.push("/admin/dashboard");
+      // Force a full page reload to ensure cookies are available
+      // This is more reliable in production than router.push
+      window.location.href = "/admin/dashboard";
       
     } catch (err: any) {
       console.error("Login error:", err);

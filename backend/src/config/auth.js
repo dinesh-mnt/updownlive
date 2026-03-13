@@ -52,7 +52,7 @@ export function createAuth() {
         },
         verifiedStatus: {
           type: "string",
-          defaultValue: "pending", // pending, approved, rejected
+          defaultValue: "pending",
         },
       },
     },
@@ -75,7 +75,8 @@ export function createAuth() {
     trustedOrigins: [
       frontendUrl,
       "http://localhost:3000",
-      "https://updownlive-4778.vercel.app"
+      "https://updownlive-4778.vercel.app",
+      /\.vercel\.app$/
     ],
     session: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public routes
@@ -25,25 +25,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // For admin routes, check session on server-side
+  // For admin routes, let client-side protection handle it
+  // since we're using cross-origin cookies
   if (pathname.startsWith('/admin')) {
-    // Get session cookie
-    const sessionToken = request.cookies.get('better-auth.session_token');
-    
-    console.log('Middleware check:', {
-      pathname,
-      hasSessionToken: !!sessionToken,
-      cookieValue: sessionToken?.value?.substring(0, 20) + '...'
-    });
-
-    // If no session token, redirect to login
-    if (!sessionToken) {
-      console.log('No session token found, redirecting to login');
-      const loginUrl = new URL('/admin/login', request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // Session exists, allow access (role check happens client-side)
+    console.log('Admin route access attempt:', pathname);
     return NextResponse.next();
   }
 
@@ -52,12 +37,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
