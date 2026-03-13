@@ -26,6 +26,9 @@ export function createAuth() {
   });
   const db = client.db();
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
   return betterAuth({
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.BETTER_AUTH_URL || "http://localhost:5000/api/auth",
@@ -70,7 +73,8 @@ export function createAuth() {
       }
     },
     trustedOrigins: [
-      process.env.FRONTEND_URL || "http://localhost:3000",
+      frontendUrl,
+      "http://localhost:3000",
       "https://updownlive-4778.vercel.app"
     ],
     session: {
@@ -82,9 +86,11 @@ export function createAuth() {
       },
     },
     advanced: {
+      useSecureCookies: isProduction,
+      cookiePrefix: "better-auth",
       cookieOptions: {
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction,
         httpOnly: true,
         path: "/",
       }

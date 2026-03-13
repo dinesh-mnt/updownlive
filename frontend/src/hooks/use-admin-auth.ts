@@ -20,19 +20,24 @@ export function useAdminAuth(): AdminAuthState {
   const router = useRouter();
 
   useEffect(() => {
+    let mounted = true;
+
     const verifyAdminAuth = async () => {
       try {
-        // Add a delay to ensure cookies are set
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Give time for cookies to be available
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         const { data: sessionData, error } = await authClient.getSession();
         
         console.log('Admin auth check:', { 
           hasSession: !!sessionData, 
           hasUser: !!sessionData?.user,
-          error: error?.message 
+          error: error?.message,
+          cookies: document.cookie
         }); // Debug log
         
+        if (!mounted) return;
+
         if (error) {
           console.error('Session error:', error);
         }
@@ -40,7 +45,7 @@ export function useAdminAuth(): AdminAuthState {
         if (!sessionData?.user) {
           // No session, redirect to login
           console.log('No session found, redirecting to login');
-          router.replace('/admin/login'); // Use replace instead of push
+          router.replace('/admin/login');
           return;
         }
 
@@ -73,11 +78,17 @@ export function useAdminAuth(): AdminAuthState {
         });
       } catch (err) {
         console.error('Admin auth verification error:', err);
-        router.replace('/admin/login');
+        if (mounted) {
+          router.replace('/admin/login');
+        }
       }
     };
     
     verifyAdminAuth();
+
+    return () => {
+      mounted = false;
+    };
   }, [router]);
 
   return state;

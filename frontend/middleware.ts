@@ -1,19 +1,49 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  // Get the pathname of the request (e.g. /admin/dashboard)
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check if the request is for an admin route
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login') && !pathname.startsWith('/admin/register')) {
-    // For admin routes, we'll let the client-side protection handle it
-    // since we need to check the user's role from the session
-    // The middleware here is mainly for logging and future server-side checks
+  // Allow public routes
+  if (
+    pathname.startsWith('/admin/login') || 
+    pathname.startsWith('/admin/register') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/assets') ||
+    pathname === '/' ||
+    pathname.startsWith('/about') ||
+    pathname.startsWith('/contact') ||
+    pathname.startsWith('/brokers') ||
+    pathname.startsWith('/charts') ||
+    pathname.startsWith('/crypto') ||
+    pathname.startsWith('/forex') ||
+    pathname.startsWith('/gold') ||
+    pathname.startsWith('/news') ||
+    pathname.startsWith('/economic-calendar')
+  ) {
+    return NextResponse.next();
+  }
+
+  // For admin routes, check session on server-side
+  if (pathname.startsWith('/admin')) {
+    // Get session cookie
+    const sessionToken = request.cookies.get('better-auth.session_token');
     
-    console.log(`Admin route access attempt: ${pathname}`);
-    
-    // Continue to the route - client-side protection will handle role checking
+    console.log('Middleware check:', {
+      pathname,
+      hasSessionToken: !!sessionToken,
+      cookieValue: sessionToken?.value?.substring(0, 20) + '...'
+    });
+
+    // If no session token, redirect to login
+    if (!sessionToken) {
+      console.log('No session token found, redirecting to login');
+      const loginUrl = new URL('/admin/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Session exists, allow access (role check happens client-side)
     return NextResponse.next();
   }
 
@@ -24,11 +54,10 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

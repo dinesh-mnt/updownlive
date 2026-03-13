@@ -90,7 +90,6 @@ export default function LoginPage() {
       const { data, error: authError } = await authClient.signIn.email({
         email: email.trim(),
         password,
-        callbackURL: "/admin/dashboard", // Add callback URL
       });
 
       console.log('Login response:', { data, authError }); // Debug log
@@ -115,12 +114,11 @@ export default function LoginPage() {
         return;
       }
 
-      // Small delay to ensure cookies are properly set
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Wait for cookies to be set properly
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Force a page reload to ensure cookies are set
-      // This is more reliable than router.push in production
-      window.location.href = "/admin/dashboard";
+      // Use router.push instead of window.location for better Next.js handling
+      router.push("/admin/dashboard");
       
     } catch (err: any) {
       console.error("Login error:", err);
