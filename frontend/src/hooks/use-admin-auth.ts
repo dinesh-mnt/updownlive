@@ -22,16 +22,24 @@ export function useAdminAuth(): AdminAuthState {
   useEffect(() => {
     const verifyAdminAuth = async () => {
       try {
+        // Add a small delay to ensure cookies are set
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const { data: sessionData, error } = await authClient.getSession();
+        
+        console.log('Admin auth check:', { sessionData, error }); // Debug log
         
         if (error || !sessionData) {
           // No session, redirect to login
+          console.log('No session found, redirecting to login');
           router.push('/admin/login');
           return;
         }
 
         const user = sessionData.user;
         const isAdmin = (user as any)?.role === 'admin';
+
+        console.log('User role check:', { user, isAdmin }); // Debug log
 
         if (!isAdmin) {
           // User is logged in but not admin

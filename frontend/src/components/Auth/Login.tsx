@@ -85,17 +85,41 @@ export default function LoginPage() {
     }
 
     try {
+      console.log('Attempting login...'); // Debug log
+      
       const { data, error: authError } = await authClient.signIn.email({
         email: email.trim(),
         password,
       });
 
+      console.log('Login response:', { data, authError }); // Debug log
+
       if (authError) {
         throw new Error(authError.message || "Login failed");
       }
 
+      if (!data?.user) {
+        throw new Error("No user data returned");
+      }
+
+      console.log('User logged in:', data.user); // Debug log
+
+      // Wait a moment for session to be established
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Verify session before redirect
+      const { data: sessionData } = await authClient.getSession();
+      console.log('Session after login:', sessionData); // Debug log
+
+      if (!sessionData?.user) {
+        throw new Error("Session not established");
+      }
+
       // Redirect based on role
-      if ((data?.user as any)?.role === "admin") {
+      const isAdmin = (sessionData.user as any)?.role === "admin";
+      console.log('Redirecting user, isAdmin:', isAdmin); // Debug log
+      
+      if (isAdmin) {
         router.push("/admin/dashboard");
       } else {
         router.push("/");

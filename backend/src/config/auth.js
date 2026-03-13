@@ -70,10 +70,20 @@ export function createAuth() {
       }
     },
     trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
+    session: {
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      updateAge: 60 * 60 * 24, // 1 day
+      cookieCache: {
+        enabled: true,
+        maxAge: 60 * 5, // 5 minutes
+      },
+    },
     advanced: {
       cookieOptions: {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        path: "/",
         // If frontend and backend are on different subdomains of the same registrable domain,
         // you might want to set the domain property here.
       }
