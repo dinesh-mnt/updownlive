@@ -55,9 +55,10 @@ export default function LoginPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: window.location.origin + "/",
+        callbackURL: window.location.origin + "/auth/callback",
       });
       // Note: The redirect happens automatically after successful Google auth
+      // The callback will be handled by the middleware or a callback page
     } catch (err: any) {
       console.error("Google sign-in error:", err);
       setError(err?.message || "Google sign-in failed. Please try again.");
@@ -117,18 +118,17 @@ export default function LoginPage() {
       const isAdmin = (freshSession?.user as any)?.role === "admin";
       console.log('User role from fresh session:', isAdmin); // Debug log
 
-      if (!isAdmin) {
-        setError("Access denied. Admin privileges required.");
-        setLoading(false);
-        return;
-      }
-
       // Wait for cookies to be set properly
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Force a full page reload to ensure cookies are available
-      // This is more reliable in production than router.push
-      window.location.href = "/admin/dashboard";
+      // Redirect based on role
+      if (isAdmin) {
+        // Admin users go to dashboard
+        window.location.href = "/admin/dashboard";
+      } else {
+        // Regular users go to home page
+        window.location.href = "/";
+      }
       
     } catch (err: any) {
       console.error("Login error:", err);

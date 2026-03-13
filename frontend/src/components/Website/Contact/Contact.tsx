@@ -63,9 +63,21 @@ export default function ContactPage() {
     }
     setStatus('loading');
     setErrorMessage('');
+    
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      await axios.post(`${apiUrl}/enquiries`, formData);
+      console.log('Submitting enquiry to:', `${apiUrl}/enquiries`);
+      console.log('Form data:', formData);
+      
+      const response = await axios.post(`${apiUrl}/enquiries`, formData, {
+        timeout: 30000, // 30 second timeout
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      
+      console.log('Enquiry response:', response.data);
       setStatus('success');
       setFormData({
         department: 'Support',
@@ -78,8 +90,21 @@ export default function ContactPage() {
         agreedToTerms: false,
       });
     } catch (err: any) {
+      console.error('Enquiry submission error:', err);
+      console.error('Error response:', err.response);
+      console.error('Error message:', err.message);
+      
       setStatus('error');
-      setErrorMessage(err.response?.data?.message || 'Something went wrong. Please try again.');
+      
+      if (err.code === 'ECONNABORTED') {
+        setErrorMessage('Request timeout. Please check your internet connection and try again.');
+      } else if (err.message === 'Network Error') {
+        setErrorMessage('Network error. Please check if the API server is running and accessible.');
+      } else if (err.response?.status === 0) {
+        setErrorMessage('Cannot connect to server. This might be a CORS issue or the server is not responding.');
+      } else {
+        setErrorMessage(err.response?.data?.message || 'Something went wrong. Please try again.');
+      }
     }
   };
 

@@ -47,9 +47,10 @@ export default function RegisterPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: window.location.origin + "/",
+        callbackURL: window.location.origin + "/auth/callback",
       });
       // Note: The redirect happens automatically after successful Google auth
+      // The callback will be handled by the middleware or a callback page
     } catch (err: any) {
       console.error("Google sign-in error:", err);
       setError(err?.message || "Google sign-in failed. Please try again.");
@@ -108,12 +109,14 @@ export default function RegisterPage() {
       const isAdmin = (data.user as any)?.role === "admin";
       
       // Wait for cookies to be set properly
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Force page reload for reliable cookie setting
+      // Redirect based on role
       if (isAdmin) {
+        // Admin users go to dashboard
         window.location.href = "/admin/dashboard";
       } else {
+        // Regular users go to home page
         window.location.href = "/";
       }
     } catch (err: any) {

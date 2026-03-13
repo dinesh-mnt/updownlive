@@ -105,6 +105,7 @@ export function createAuth() {
       frontendUrl,
       "http://localhost:3000",
       "http://localhost:5000",
+      "https://updownlive.vercel.app",
       "https://updownlive-4778.vercel.app",
       /\.vercel\.app$/
     ].filter(Boolean),

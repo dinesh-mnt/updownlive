@@ -66,6 +66,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://updownlive.vercel.app',
   'https://updownlive-4778.vercel.app',
 ];
 
