@@ -16,7 +16,8 @@ export default function ArticlePage() {
       try {
         let API_KEY = '';
         try {
-          const configRes = await axios.get('http://localhost:5000/api/settings/news-api-key');
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+          const configRes = await axios.get(`${apiUrl}/settings/news-api-key`);
           if (configRes.data?.apiKey) API_KEY = configRes.data.apiKey;
         } catch (e) {
           console.error('Failed to load API Key from DB');

@@ -103,10 +103,19 @@ export default function LoginPage() {
       }
 
       console.log('User logged in:', data.user); // Debug log
+      console.log('User object keys:', Object.keys(data.user)); // Debug log
+      console.log('Full user data:', JSON.stringify(data.user, null, 2)); // Debug log
 
-      // Check role immediately from login response
-      const isAdmin = (data.user as any)?.role === "admin";
-      console.log('User role from login:', isAdmin); // Debug log
+      // Wait a moment for the database hook to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Fetch fresh session to get updated role
+      const { data: freshSession } = await authClient.getSession();
+      console.log('Fresh session after login:', freshSession); // Debug log
+
+      // Check role from fresh session
+      const isAdmin = (freshSession?.user as any)?.role === "admin";
+      console.log('User role from fresh session:', isAdmin); // Debug log
 
       if (!isAdmin) {
         setError("Access denied. Admin privileges required.");

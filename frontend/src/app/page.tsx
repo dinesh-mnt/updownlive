@@ -13,11 +13,13 @@ export async function generateMetadata() {
 
 async function getTopNews() {
   let API_KEY = "";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  
   try {
     const configRes = await axios.get(
-      "http://localhost:5000/api/settings/news-api-key",
+      `${apiUrl}/settings/news-api-key`,
       {
-        timeout: 3000,
+        timeout: 5000,
         validateStatus: (status) => status < 500,
       }
     );
