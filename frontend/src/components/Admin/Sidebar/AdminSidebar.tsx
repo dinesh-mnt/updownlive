@@ -97,7 +97,7 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className="flex h-full w-64 shrink-0 flex-col font-sans bg-brand-black border-r border-white/10 shadow-sm z-40 text-white">
+    <div className="flex h-full w-64 shrink-0 flex-col font-outfit bg-brand-black border-r border-white/10 shadow-sm z-40 text-white">
       {/* Logo Header */}
       <div className="flex px-4 py-5 border-b border-white/10 items-center justify-center">
         <Link href="/admin/dashboard" className="flex items-center justify-center w-full rounded-lg p-2 shadow-sm hover:opacity-90 transition-opacity">

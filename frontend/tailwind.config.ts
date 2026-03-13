@@ -19,7 +19,7 @@ module.exports = {
         }
       },
       fontFamily: {
-         outfit: ['var(--font-outfit)', 'system-ui', 'sans-serif'],
+         outfit: ['var(--font-outfit)'],
       }
     },
   },

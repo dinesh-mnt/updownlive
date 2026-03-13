@@ -59,7 +59,7 @@
 }
 
 @theme inline {
-  --font-outfit: var(--font-outfit), system-ui, sans-serif;
+  --font-outfit: var(--font-outfit);
 
   --color-brand-blue: #0642f0;
   --color-brand-red: #c63634;

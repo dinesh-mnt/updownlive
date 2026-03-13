@@ -42,7 +42,7 @@ export default function AdminHeader() {
   }
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-brand-border bg-white/70 backdrop-blur-md px-6 sticky top-0 z-30">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-brand-border bg-white/70 backdrop-blur-md px-6 sticky top-0 z-30 font-outfit">
       <div className="flex items-center gap-2">
         <h2 className="ml-1 font-bold text-brand-black tracking-tight text-lg">{currentTitle}</h2>
       </div>

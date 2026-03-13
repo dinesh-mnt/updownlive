@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
 
 export default function Dashboard() {
   return (
-    <>
+    <div className="font-outfit">
       <div className="mb-10">
         <h1 className="text-3xl md:text-4xl font-extrabold text-brand-black mb-2 tracking-tight">Admin Dashboard</h1>
         <p className="text-brand-gray text-lg">Here's what's happening today.</p>
@@ -57,6 +57,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   );
 }

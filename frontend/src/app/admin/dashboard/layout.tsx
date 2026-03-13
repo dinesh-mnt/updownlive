@@ -8,7 +8,7 @@ import AdminProtected from '@/components/Admin/AdminProtected';
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminProtected>
-      <div className="flex h-screen w-full bg-slate-50 font-sans">
+      <div className="flex h-screen w-full bg-slate-50 font-outfit">
         <AdminSidebar />
         <div className="flex flex-col flex-1 overflow-hidden">
           <AdminHeader />
