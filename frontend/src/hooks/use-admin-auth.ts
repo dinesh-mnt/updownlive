@@ -23,23 +23,35 @@ export function useAdminAuth(): AdminAuthState {
     const verifyAdminAuth = async () => {
       try {
         // Add a small delay to ensure cookies are set
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         const { data: sessionData, error } = await authClient.getSession();
         
-        console.log('Admin auth check:', { sessionData, error }); // Debug log
+        console.log('Admin auth check:', { 
+          hasSession: !!sessionData, 
+          hasUser: !!sessionData?.user,
+          error: error?.message 
+        }); // Debug log
         
-        if (error || !sessionData) {
+        if (error) {
+          console.error('Session error:', error);
+        }
+        
+        if (!sessionData?.user) {
           // No session, redirect to login
           console.log('No session found, redirecting to login');
-          router.push('/admin/login');
+          router.replace('/admin/login'); // Use replace instead of push
           return;
         }
 
         const user = sessionData.user;
         const isAdmin = (user as any)?.role === 'admin';
 
-        console.log('User role check:', { user, isAdmin }); // Debug log
+        console.log('User role check:', { 
+          email: user.email, 
+          role: (user as any)?.role,
+          isAdmin 
+        }); // Debug log
 
         if (!isAdmin) {
           // User is logged in but not admin
@@ -61,7 +73,7 @@ export function useAdminAuth(): AdminAuthState {
         });
       } catch (err) {
         console.error('Admin auth verification error:', err);
-        router.push('/admin/login');
+        router.replace('/admin/login');
       }
     };
     

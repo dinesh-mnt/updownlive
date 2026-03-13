@@ -92,18 +92,26 @@ export default function RegisterPage() {
       const { data, error: authError } = await authClient.signUp.email({
         email: email.trim(),
         password,
-        name: name.trim()
+        name: name.trim(),
+        callbackURL: "/admin/dashboard",
       });
 
       if (authError) {
         throw new Error(authError.message || 'Registration failed');
       }
 
-      // Redirect based on role
-      if ((data?.user as any)?.role === "admin") {
-        router.push("/admin/dashboard");
+      if (!data?.user) {
+        throw new Error("No user data returned");
+      }
+
+      // Check role from registration response
+      const isAdmin = (data.user as any)?.role === "admin";
+      
+      // Force page reload for reliable cookie setting
+      if (isAdmin) {
+        window.location.href = "/admin/dashboard";
       } else {
-        router.push("/");
+        window.location.href = "/";
       }
     } catch (err: any) {
       console.error('Registration error:', err);
@@ -112,7 +120,6 @@ export default function RegisterPage() {
           err.message ||
           'Registration failed. Please try again.'
       );
-    } finally {
       setLoading(false);
     }
   };

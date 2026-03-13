@@ -90,6 +90,7 @@ export default function LoginPage() {
       const { data, error: authError } = await authClient.signIn.email({
         email: email.trim(),
         password,
+        callbackURL: "/admin/dashboard", // Add callback URL
       });
 
       console.log('Login response:', { data, authError }); // Debug log
@@ -104,26 +105,20 @@ export default function LoginPage() {
 
       console.log('User logged in:', data.user); // Debug log
 
-      // Wait a moment for session to be established
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Check role immediately from login response
+      const isAdmin = (data.user as any)?.role === "admin";
+      console.log('User role from login:', isAdmin); // Debug log
 
-      // Verify session before redirect
-      const { data: sessionData } = await authClient.getSession();
-      console.log('Session after login:', sessionData); // Debug log
-
-      if (!sessionData?.user) {
-        throw new Error("Session not established");
+      if (!isAdmin) {
+        setError("Access denied. Admin privileges required.");
+        setLoading(false);
+        return;
       }
 
-      // Redirect based on role
-      const isAdmin = (sessionData.user as any)?.role === "admin";
-      console.log('Redirecting user, isAdmin:', isAdmin); // Debug log
+      // Force a page reload to ensure cookies are set
+      // This is more reliable than router.push in production
+      window.location.href = "/admin/dashboard";
       
-      if (isAdmin) {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/");
-      }
     } catch (err: any) {
       console.error("Login error:", err);
       setError(
@@ -131,7 +126,6 @@ export default function LoginPage() {
           err.message ||
           "Login failed. Please check your credentials.",
       );
-    } finally {
       setLoading(false);
     }
   };
