@@ -16,8 +16,9 @@ const connectDB = async () => {
     const conn = await mongoose.connect(dbUri);
     
     console.log(`✅ MongoDB Successfully Connected!`);
-    console.log(`🔗 Database Host: ${conn.connection.host}`);
-    console.log(`📂 Database Name: ${conn.connection.name}`);
+    console.log(`🔗 Host: ${conn.connection.host}`);
+    console.log(`📂 Database: ${conn.connection.name}`);
+    console.log(`📊 State: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Error'}`);
     
     // Seed Admin User
     if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {

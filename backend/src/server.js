@@ -122,7 +122,7 @@ app.get('/', (_req, res) => {
 });
 
 // Health check endpoint
-app.get('/health', (_req, res) => {
+app.get('/health', async (_req, res) => {
   const dbStatus = mongoose.connection.readyState;
   const dbStatusText = {
     0: 'disconnected',
@@ -131,9 +131,22 @@ app.get('/health', (_req, res) => {
     3: 'disconnecting'
   }[dbStatus] || 'unknown';
 
+  let betterAuthDbStatus = 'unknown';
+  try {
+    const client = await getMongoClient();
+    // Use ping to verify actual connectivity for MongoClient
+    await client.db().command({ ping: 1 });
+    betterAuthDbStatus = 'connected';
+  } catch (err) {
+    betterAuthDbStatus = 'error: ' + err.message;
+  }
+
+  const isHealthy = dbStatus === 1 && betterAuthDbStatus === 'connected';
+
   res.json({
-    status: dbStatus === 1 ? 'healthy' : 'unhealthy',
-    database: dbStatusText,
+    status: isHealthy ? 'healthy' : 'unhealthy',
+    mongoose: dbStatusText,
+    betterAuth: betterAuthDbStatus,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development'
