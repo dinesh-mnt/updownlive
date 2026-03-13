@@ -115,6 +115,9 @@ export default function LoginPage() {
         return;
       }
 
+      // Small delay to ensure cookies are properly set
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       // Force a page reload to ensure cookies are set
       // This is more reliable than router.push in production
       window.location.href = "/admin/dashboard";

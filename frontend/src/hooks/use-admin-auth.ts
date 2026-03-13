@@ -22,8 +22,8 @@ export function useAdminAuth(): AdminAuthState {
   useEffect(() => {
     const verifyAdminAuth = async () => {
       try {
-        // Add a small delay to ensure cookies are set
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // Add a delay to ensure cookies are set
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         const { data: sessionData, error } = await authClient.getSession();
         

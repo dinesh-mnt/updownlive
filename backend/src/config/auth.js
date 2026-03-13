@@ -69,7 +69,10 @@ export function createAuth() {
         }
       }
     },
-    trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
+    trustedOrigins: [
+      process.env.FRONTEND_URL || "http://localhost:3000",
+      "https://updownlive-4778.vercel.app"
+    ],
     session: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days
       updateAge: 60 * 60 * 24, // 1 day
@@ -80,12 +83,10 @@ export function createAuth() {
     },
     advanced: {
       cookieOptions: {
-        sameSite: process.env.NODE_ENV === "production" ? "lax" : "lax", // Changed from "none" to "lax"
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         path: "/",
-        // If frontend and backend are on different subdomains of the same registrable domain,
-        // you might want to set the domain property here.
       }
     }
   });
