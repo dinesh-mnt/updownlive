@@ -80,7 +80,7 @@ export function createAuth() {
     },
     advanced: {
       cookieOptions: {
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "lax" : "lax", // Changed from "none" to "lax"
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         path: "/",
