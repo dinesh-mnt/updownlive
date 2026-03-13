@@ -89,8 +89,8 @@ export function createAuth() {
     advanced: {
       useSecureCookies: isProduction,
       cookiePrefix: "better-auth",
-      cookieOptions: {
-        sameSite: isProduction ? "none" : "lax",
+      defaultCookieAttributes: {
+        sameSite: isProduction ? "lax" : "lax", // Use 'lax' for same-domain, 'none' for cross-domain
         secure: isProduction,
         httpOnly: true,
         path: "/",
