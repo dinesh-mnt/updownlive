@@ -14,6 +14,9 @@ import connectDB from './config/db.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// trust proxy is required for secure cookies on Vercel
+app.set('trust proxy', 1);
+
 // Initialize Better Auth
 const auth = createAuth();
 

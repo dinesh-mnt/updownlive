@@ -70,5 +70,13 @@ export function createAuth() {
       }
     },
     trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
+    advanced: {
+      cookieOptions: {
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
+        // If frontend and backend are on different subdomains of the same registrable domain,
+        // you might want to set the domain property here.
+      }
+    }
   });
 }
