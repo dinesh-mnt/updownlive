@@ -27,6 +27,7 @@ export function createAuth() {
   const db = client.db();
 
   const isProduction = process.env.NODE_ENV === 'production';
+  const isVercel = process.env.VERCEL === '1';
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
   return betterAuth({
@@ -35,6 +36,31 @@ export function createAuth() {
     database: mongodbAdapter(db, {
       client
     }),
+    session: {
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      updateAge: 60 * 60 * 24, // Only update session once per day (reduces DB writes)
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60, // Cache for 5 minutes
+      },
+    },
+    // Advanced configuration for production cookie handling
+    // Using the recommended 'advanced' pattern from Better Auth docs
+    advanced: {
+      // Force secure cookies in production OR Vercel environment
+      useSecureCookies: isProduction || isVercel,
+      cookiePrefix: "better-auth",
+      // Default attributes for all cookies
+      defaultCookieAttributes: {
+        httpOnly: true,
+        // Vital for Vercel/Render deployments behind load balancers
+        secure: isProduction || isVercel,
+        // For cross-domain (frontend on domain A, backend on domain B),
+        // sameSite MUST be "none" in production with secure: true
+        sameSite: isProduction || isVercel ? "none" : "lax",
+        path: "/",
+      },
+    },
     emailAndPassword: {
       enabled: true,
     },
@@ -42,6 +68,9 @@ export function createAuth() {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || "",
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+        // Better Auth handles the redirect URI automatically based on baseURL
+        prompt: "select_account",
+        accessType: "offline",
       },
     },
     user: {
@@ -75,26 +104,9 @@ export function createAuth() {
     trustedOrigins: [
       frontendUrl,
       "http://localhost:3000",
+      "http://localhost:5000",
       "https://updownlive-4778.vercel.app",
       /\.vercel\.app$/
-    ],
-    session: {
-      expiresIn: 60 * 60 * 24 * 7, // 7 days
-      updateAge: 60 * 60 * 24, // 1 day
-      cookieCache: {
-        enabled: true,
-        maxAge: 60 * 5, // 5 minutes
-      },
-    },
-    advanced: {
-      useSecureCookies: isProduction,
-      cookiePrefix: "better-auth",
-      defaultCookieAttributes: {
-        sameSite: isProduction ? "lax" : "lax", // Use 'lax' for same-domain, 'none' for cross-domain
-        secure: isProduction,
-        httpOnly: true,
-        path: "/",
-      }
-    }
+    ].filter(Boolean),
   });
 }
