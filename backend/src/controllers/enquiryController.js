@@ -3,40 +3,79 @@ import { sendEmail } from '../config/emailService.js';
 
 export const submitEnquiry = async (req, res) => {
   try {
+    console.log('📝 Enquiry submission received:', {
+      department: req.body.department,
+      email: req.body.email,
+      timestamp: new Date().toISOString()
+    });
+
     const { department, firstName, lastName, email, phone, companyName, message } = req.body;
 
+    // Validate required fields
+    if (!department || !firstName || !lastName || !email || !message) {
+      console.error('❌ Missing required fields');
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Missing required fields',
+        required: ['department', 'firstName', 'lastName', 'email', 'message']
+      });
+    }
+
+    // Create enquiry in database
+    console.log('💾 Creating enquiry in database...');
     const enquiry = await Enquiry.create({
       department,
       firstName,
       lastName,
       email,
-      phone,
-      companyName,
+      phone: phone || '',
+      companyName: companyName || '',
       message,
     });
+    console.log('✅ Enquiry created successfully:', enquiry._id);
 
-    // Send thank you email to the user
-    try {
-      await sendEmail({
-        to: email,
-        subject: `Thank you for contacting UpDownLive - ${department}`,
-        text: `Hello ${firstName},\n\nThank you for reaching out to us. We have received your message regarding "${department}" and our team will get back to you shortly.\n\nYour message:\n${message}\n\nBest regards,\nUpDownLive Team`,
-        html: `
-          <h3>Hello ${firstName},</h3>
-          <p>Thank you for reaching out to us. We have received your message regarding <strong>${department}</strong> and our team will get back to you shortly.</p>
-          <p><strong>Your message:</strong><br/>${message}</p>
-          <p>Best regards,<br/>UpDownLive Team</p>
-        `
-      });
-    } catch (emailError) {
-      console.error('Error sending email:', emailError);
-      // We don't fail the whole request if only the email fails
-    }
+    // Send thank you email to the user (non-blocking)
+    // We don't wait for email to complete to avoid timeout issues
+    setImmediate(async () => {
+      try {
+        console.log('📧 Attempting to send thank you email...');
+        await sendEmail({
+          to: email,
+          subject: `Thank you for contacting UpDownLive - ${department}`,
+          text: `Hello ${firstName},\n\nThank you for reaching out to us. We have received your message regarding "${department}" and our team will get back to you shortly.\n\nYour message:\n${message}\n\nBest regards,\nUpDownLive Team`,
+          html: `
+            <h3>Hello ${firstName},</h3>
+            <p>Thank you for reaching out to us. We have received your message regarding <strong>${department}</strong> and our team will get back to you shortly.</p>
+            <p><strong>Your message:</strong><br/>${message}</p>
+            <p>Best regards,<br/>UpDownLive Team</p>
+          `
+        });
+        console.log('✅ Thank you email sent successfully');
+      } catch (emailError) {
+        console.error('⚠️  Email sending failed (non-critical):', emailError.message);
+        // Email failure doesn't affect the enquiry submission
+      }
+    });
 
+    // Return success immediately
     res.status(201).json({ success: true, data: enquiry });
   } catch (error) {
-    console.error('Error submitting enquiry:', error);
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    console.error('❌ Error submitting enquiry:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Server error';
+    if (error.name === 'ValidationError') {
+      errorMessage = 'Invalid data provided';
+    } else if (error.name === 'MongoError' || error.name === 'MongoServerError') {
+      errorMessage = 'Database error';
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: errorMessage, 
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 };
 

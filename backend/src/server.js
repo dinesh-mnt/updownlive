@@ -4,6 +4,7 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 import { toNodeHandler } from 'better-auth/node';
 import { createAuth, getMongoClient } from './config/auth.js';
 import settingsRoutes from './routes/settingsRoutes.js';
@@ -112,7 +113,31 @@ app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/users', userRoutes);
 
 app.get('/', (_req, res) => {
-  res.json({ message: 'UpDownLive API is running' });
+  res.json({ 
+    message: 'UpDownLive API is running',
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
+// Health check endpoint
+app.get('/health', (_req, res) => {
+  const dbStatus = mongoose.connection.readyState;
+  const dbStatusText = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  }[dbStatus] || 'unknown';
+
+  res.json({
+    status: dbStatus === 1 ? 'healthy' : 'unhealthy',
+    database: dbStatusText,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 app.listen(PORT, async () => {
