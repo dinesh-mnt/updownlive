@@ -153,8 +153,13 @@ app.get('/health', async (_req, res) => {
   });
 });
 
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-  await connectDB();
-  await initializeAdmin();
-});
+if (process.env.NODE_ENV !== 'test' && process.env.VERCEL !== '1') {
+  app.listen(PORT, async () => {
+    console.log(`Server running on port ${PORT}`);
+    await connectDB();
+    await initializeAdmin();
+  });
+}
+
+// Still need to export for Vercel functions
+export default app;

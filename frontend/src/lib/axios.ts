@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 
+const isBrowser = typeof window !== 'undefined';
+
 // Create axios instance with base configuration
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
@@ -14,12 +16,11 @@ const axiosInstance: AxiosInstance = axios.create({
 // Request interceptor to add auth token
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Get token from localStorage or sessionStorage
-    // Check for admin token first, then vendor token, then checker token, then user token
-    const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
-    const vendorToken = localStorage.getItem('vendorToken');
-    const checkerToken = localStorage.getItem('checkerToken');
-    const userToken = localStorage.getItem('userToken') || sessionStorage.getItem('userToken');
+    // Get token from localStorage or sessionStorage safely in SSR environment
+    const adminToken = isBrowser ? (localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken')) : null;
+    const vendorToken = isBrowser ? localStorage.getItem('vendorToken') : null;
+    const checkerToken = isBrowser ? localStorage.getItem('checkerToken') : null;
+    const userToken = isBrowser ? (localStorage.getItem('userToken') || sessionStorage.getItem('userToken')) : null;
 
     const token = adminToken || vendorToken || checkerToken || userToken;
 
@@ -56,17 +57,19 @@ axiosInstance.interceptors.response.use(
 
           if (!isLoginAttempt) {
             // Unauthorized - clear tokens and redirect to login (only for authenticated requests)
-            localStorage.removeItem('adminToken');
-            sessionStorage.removeItem('adminToken');
-            localStorage.removeItem('vendorToken');
-            localStorage.removeItem('vendorData');
-            localStorage.removeItem('checkerToken');
-            localStorage.removeItem('checkerData');
-            localStorage.removeItem('checkerID');
-            localStorage.removeItem('userToken');
-            sessionStorage.removeItem('userToken');
-            localStorage.removeItem('userData');
-            sessionStorage.removeItem('userData');
+            if (isBrowser) {
+              localStorage.removeItem('adminToken');
+              sessionStorage.removeItem('adminToken');
+              localStorage.removeItem('vendorToken');
+              localStorage.removeItem('vendorData');
+              localStorage.removeItem('checkerToken');
+              localStorage.removeItem('checkerData');
+              localStorage.removeItem('checkerID');
+              localStorage.removeItem('userToken');
+              sessionStorage.removeItem('userToken');
+              localStorage.removeItem('userData');
+              sessionStorage.removeItem('userData');
+            }
             if (typeof window !== 'undefined') {
               // Redirect based on current path
               const currentPath = window.location.pathname;
@@ -131,7 +134,7 @@ export const createVendorAxiosInstance = () => {
 
 // Create axios instance with admin token
 export const createAdminAxiosInstance = () => {
-  const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+  const adminToken = isBrowser ? (localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken')) : null;
 
   return axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
