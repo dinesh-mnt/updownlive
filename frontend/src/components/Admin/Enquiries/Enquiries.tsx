@@ -233,7 +233,7 @@ export default function Enquiries() {
             className="bg-white rounded-[2.5rem] w-full max-w-4xl shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-10 flex-shrink-0">
+            <div className="p-10 shrink-0">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center gap-6">
                   <div className="w-20 h-20 rounded-3xl bg-linear-to-br from-brand-blue to-brand-blue/60 flex items-center justify-center text-white text-4xl font-black shadow-2xl shadow-brand-blue/30 rotate-3">

@@ -13,15 +13,22 @@ const connectDB = async () => {
 
     console.log('🔄 Attempting to connect to MongoDB...');
     
-    const conn = await mongoose.connect(dbUri);
+    // Optimize connection for serverless
+    const conn = await mongoose.connect(dbUri, {
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      bufferCommands: false, // Disable mongoose buffering
+      bufferMaxEntries: 0 // Disable mongoose buffering
+    });
     
     console.log(`✅ MongoDB Successfully Connected!`);
     console.log(`🔗 Host: ${conn.connection.host}`);
     console.log(`📂 Database: ${conn.connection.name}`);
     console.log(`📊 State: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Error'}`);
     
-    // Seed Admin User
-    if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+    // Seed Admin User (only in development)
+    if (process.env.NODE_ENV !== 'production' && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
       const adminExists = await User.findOne({ email: process.env.ADMIN_EMAIL });
       if (!adminExists) {
         await User.create({

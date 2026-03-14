@@ -1,6 +1,9 @@
 import Enquiry from '../models/Enquiry.js';
 import { sendEmail } from '../config/emailService.js';
 
+import Enquiry from '../models/Enquiry.js';
+import { sendEmail } from '../config/emailService.js';
+
 export const submitEnquiry = async (req, res) => {
   try {
     console.log('📝 Enquiry submission received:', {
@@ -34,31 +37,29 @@ export const submitEnquiry = async (req, res) => {
     });
     console.log('✅ Enquiry created successfully:', enquiry._id);
 
-    // Send thank you email to the user (non-blocking)
-    // We don't wait for email to complete to avoid timeout issues
-    setImmediate(async () => {
-      try {
-        console.log('📧 Attempting to send thank you email...');
-        await sendEmail({
-          to: email,
-          subject: `Thank you for contacting UpDownLive - ${department}`,
-          text: `Hello ${firstName},\n\nThank you for reaching out to us. We have received your message regarding "${department}" and our team will get back to you shortly.\n\nYour message:\n${message}\n\nBest regards,\nUpDownLive Team`,
-          html: `
-            <h3>Hello ${firstName},</h3>
-            <p>Thank you for reaching out to us. We have received your message regarding <strong>${department}</strong> and our team will get back to you shortly.</p>
-            <p><strong>Your message:</strong><br/>${message}</p>
-            <p>Best regards,<br/>UpDownLive Team</p>
-          `
-        });
-        console.log('✅ Thank you email sent successfully');
-      } catch (emailError) {
-        console.error('⚠️  Email sending failed (non-critical):', emailError.message);
-        // Email failure doesn't affect the enquiry submission
-      }
-    });
-
-    // Return success immediately
+    // Return success immediately to avoid timeout
     res.status(201).json({ success: true, data: enquiry });
+
+    // Send thank you email asynchronously (fire and forget)
+    // This prevents email issues from affecting the user experience
+    try {
+      console.log('📧 Attempting to send thank you email...');
+      await sendEmail({
+        to: email,
+        subject: `Thank you for contacting UpDownLive - ${department}`,
+        text: `Hello ${firstName},\n\nThank you for reaching out to us. We have received your message regarding "${department}" and our team will get back to you shortly.\n\nYour message:\n${message}\n\nBest regards,\nUpDownLive Team`,
+        html: `
+          <h3>Hello ${firstName},</h3>
+          <p>Thank you for reaching out to us. We have received your message regarding <strong>${department}</strong> and our team will get back to you shortly.</p>
+          <p><strong>Your message:</strong><br/>${message}</p>
+          <p>Best regards,<br/>UpDownLive Team</p>
+        `
+      });
+      console.log('✅ Thank you email sent successfully');
+    } catch (emailError) {
+      console.error('⚠️  Email sending failed (non-critical):', emailError.message);
+      // Email failure doesn't affect the enquiry submission
+    }
   } catch (error) {
     console.error('❌ Error submitting enquiry:', error);
     console.error('Error stack:', error.stack);

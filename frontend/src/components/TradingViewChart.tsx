@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, memo, useState } from 'react';
+import React, { useEffect, useRef, memo, useState, useId } from 'react';
 import { Loader2, AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
 
 interface TradingViewChartProps {
@@ -25,7 +25,8 @@ function TradingViewChart({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const widgetId = `tradingview_${Math.random().toString(36).substr(2, 9)}`;
+  const id = useId();
+  const widgetId = `tradingview_${id.replace(/:/g, '')}`;
 
   const loadWidget = () => {
     if (!container.current) return;
