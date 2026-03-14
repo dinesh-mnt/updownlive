@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import axiosInstance from '@/lib/axios';
 import { useRouter } from "next/navigation";
 import {
   Search, ChevronDown, ChevronUp, Clock, ExternalLink,
@@ -369,11 +370,7 @@ export default function Forex() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-        const keyRes = await axios.get(`${apiUrl}/settings/news-api-key`, {
-          timeout: 3000,
-          validateStatus: s => s < 500,
-        });
+        const keyRes = await axiosInstance.get(`/settings/news-api-key`);
         const apiKey = keyRes.data?.apiKey;
 
         if (apiKey) {

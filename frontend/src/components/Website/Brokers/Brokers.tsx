@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import axiosInstance from '@/lib/axios';
 import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp, Clock, ExternalLink, Newspaper, AlertCircle, LayoutGrid, List } from "lucide-react";
 
@@ -66,7 +67,7 @@ function ArticleRow({ a }: { a: Article }) {
           </div>
         </div>
         <a href={a.url} onClick={handleRoute} className="flex-shrink-0 w-[200px] md:w-[240px] hidden sm:block" tabIndex={-1}>
-          <img src={a.imageUrl} alt={a.title} className="w-full h-[130px] md:h-[145px] object-cover rounded-lg border border-[#eaeaea] hover:opacity-90 transition-opacity"
+          <img src={a.imageUrl} alt={a.title} className="w-full h-[130px] md:h-[145px] object-cover rounded-lg border border-brand-border hover:opacity-90 transition-opacity"
             onError={e=>{(e.target as HTMLImageElement).src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&q=80"}}/>
         </a>
       </div>
@@ -121,8 +122,7 @@ export default function Brokers() {
   useEffect(() => {
     const load = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-        const kr = await axios.get(`${apiUrl}/settings/news-api-key`, { timeout: 3000, validateStatus: s => s < 500 });
+        const kr = await axiosInstance.get(`/settings/news-api-key`);
         const key = kr.data?.apiKey;
         if (key) {
           const res = await axios.get("https://eventregistry.org/api/v1/article/getArticles", {

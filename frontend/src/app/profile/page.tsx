@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { User, Mail, Shield, Calendar, LogOut, Loader2, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import axios from "axios";
+import axiosInstance from '@/lib/axios';
 
 export default function ProfilePage() {
   const { data: session, isPending } = authClient.useSession();
@@ -21,8 +21,7 @@ export default function ProfilePage() {
     try {
       setLoadingDetails(true);
       setFetchError(null);
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      const response = await axios.get(`${apiUrl}/users/${userId}`);
+      const response = await axiosInstance.get(`/users/${userId}`);
       setUserDetails(response.data);
     } catch (error: any) {
       console.error('Error fetching user details:', error);

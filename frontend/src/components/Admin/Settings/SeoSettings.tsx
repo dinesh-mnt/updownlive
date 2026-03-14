@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from '@/lib/axios';
 import { Save, Loader2, Globe, Search, Image as ImageIcon, LayoutTemplate } from "lucide-react";
 import { Button } from "@/components/UI/Button";
 import { useToast } from "@/hooks/use-toast";
@@ -49,7 +49,7 @@ export default function SeoSettings() {
 
   const fetchSettings = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/settings/seo`);
+      const res = await axiosInstance.get(`/settings/seo`);
       if (res.data?.seo) {
         // If it was the old single-object format (without 'global' or 'home' keys), migrate it
         let fetchedSeo = res.data.seo;
@@ -85,7 +85,7 @@ export default function SeoSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await axios.post(`${apiUrl}/settings/seo`, { seo: data });
+      await axiosInstance.post(`/settings/seo`, { seo: data });
       toast({
         title: "Success",
         description: "SEO settings have been successfully updated.",
@@ -239,7 +239,7 @@ export default function SeoSettings() {
           <div className="space-y-8 sticky top-6">
             
             {/* Google Search Preview */}
-            <div className="bg-white p-5 rounded-xl border border-[#eaeaea] shadow-sm">
+            <div className="bg-white p-5 rounded-xl border border-brand-border shadow-sm">
               <div className="text-[14px] text-[#202124] flex items-center gap-2 mb-1">
                 <div className="w-6 h-6 rounded-full bg-[#f0f0f0] flex items-center justify-center shrink-0">
                   <Globe size={12} className="text-[#888]"/>
@@ -257,8 +257,8 @@ export default function SeoSettings() {
             </div>
 
             {/* Social Share Preview (Twitter/X style) */}
-            <div className="bg-white rounded-xl border border-[#eaeaea] shadow-sm overflow-hidden">
-              <div className="h-[200px] w-full bg-[#f4f4f4] border-b border-[#eaeaea] flex items-center justify-center relative overflow-hidden">
+            <div className="bg-white rounded-xl border border-brand-border shadow-sm overflow-hidden">
+              <div className="h-[200px] w-full bg-[#f4f4f4] border-b border-brand-border flex items-center justify-center relative overflow-hidden">
                 {currentData.ogImage ? (
                   <img src={currentData.ogImage} alt="OG Preview" className="w-full h-full object-cover" />
                 ) : (
@@ -268,7 +268,7 @@ export default function SeoSettings() {
                   </div>
                 )}
               </div>
-              <div className="p-3 bg-[#f8f9fa] border-t border-[#eaeaea]">
+              <div className="p-3 bg-[#f8f9fa] border-t border-brand-border">
                 <p className="text-[#536471] text-[13px] truncate uppercase tracking-wide">
                   {(() => {
                     try { return new URL(currentData.ogUrl || "https://yoursite.com").hostname; }

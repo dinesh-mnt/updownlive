@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import { Key, Eye, EyeOff, Save, Loader2, ExternalLink, CheckCircle, Info } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/Card";
 import { useToast } from "@/hooks/use-toast";
@@ -99,10 +99,9 @@ export default function ApiIntegration() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
       const fetches = API_CONFIGS.map(async (cfg) => {
         try {
-          const res = await axios.get(`${apiUrl}/settings/${cfg.endpoint}`, { timeout: 3000, validateStatus: s => s < 500 });
+          const res = await axiosInstance.get(`/settings/${cfg.endpoint}`);
           return { id: cfg.id, key: res.data?.apiKey || '' };
         } catch {
           return { id: cfg.id, key: '' };
@@ -120,8 +119,7 @@ export default function ApiIntegration() {
   const handleSave = async (cfg: ApiKeyConfig) => {
     setSaving(s => ({ ...s, [cfg.id]: true }));
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      await axios.post(`${apiUrl}/settings/${cfg.endpoint}`, { apiKey: keys[cfg.id] || '' });
+      await axiosInstance.post(`/settings/${cfg.endpoint}`, { apiKey: keys[cfg.id] || '' });
       setSaved(s => ({ ...s, [cfg.id]: true }));
       setTimeout(() => setSaved(s => ({ ...s, [cfg.id]: false })), 3000);
       toast({ variant: 'success' as any, description: `${cfg.label} API key saved successfully.` });

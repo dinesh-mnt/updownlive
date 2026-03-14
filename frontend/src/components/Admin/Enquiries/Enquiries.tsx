@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import { Mail, Loader2, Calendar, Phone, Building, Eye, X, Save, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/UI/Table";
@@ -53,10 +53,7 @@ export default function Enquiries() {
     if (!selectedEnquiry) return;
     setSavingNotice(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      await axios.patch(`${apiUrl}/enquiries/${selectedEnquiry._id}/notice`, { 
-        notice: noticeText 
-      }, { withCredentials: true });
+      await axiosInstance.patch(`/enquiries/${selectedEnquiry._id}/notice`, { notice: noticeText });
       
       setEnquiries(enquiries.map(enq => 
         enq._id === selectedEnquiry._id ? { ...enq, notice: noticeText } : enq
@@ -82,10 +79,7 @@ export default function Enquiries() {
   const fetchEnquiries = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      const response = await axios.get(`${apiUrl}/enquiries`, {
-        withCredentials: true
-      });
+      const response = await axiosInstance.get(`/enquiries`);
       setEnquiries(response.data.data || []);
     } catch (err) {
       console.error('Failed to fetch enquiries:', err);

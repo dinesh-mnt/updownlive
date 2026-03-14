@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { CalendarDays, Flag, Clock, AlertTriangle } from "lucide-react";
 import MarketPageLayout from "@/components/Website/Shared/MarketPageLayout";
 

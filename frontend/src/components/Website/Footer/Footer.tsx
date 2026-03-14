@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import { Twitter, Youtube, Facebook, Linkedin, Rss, Instagram, Send } from 'lucide-react';
 
 export default function Footer() {
@@ -18,8 +18,7 @@ export default function Footer() {
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-        const res = await axios.get(`${apiUrl}/settings/social-media`);
+        const res = await axiosInstance.get(`/settings/social-media`);
         if (res.data?.links) {
           // Merge fetched links with defaults '#'
           setSocialLinks(prev => {

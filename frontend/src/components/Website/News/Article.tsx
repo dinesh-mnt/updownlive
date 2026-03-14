@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Calendar, PenTool } from 'lucide-react';
 import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 
 export default function ArticlePage() {
   const { id } = useParams() as { id: string };
@@ -16,8 +17,7 @@ export default function ArticlePage() {
       try {
         let API_KEY = '';
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-          const configRes = await axios.get(`${apiUrl}/settings/news-api-key`);
+          const configRes = await axiosInstance.get(`/settings/news-api-key`);
           if (configRes.data?.apiKey) API_KEY = configRes.data.apiKey;
         } catch (e) {
           console.error('Failed to load API Key from DB');

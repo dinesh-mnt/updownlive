@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import { Share2, Save, Loader2, Twitter, Youtube, Facebook, Linkedin, Rss, Instagram, Send } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/Card";
 import { useToast } from "@/hooks/use-toast";
@@ -22,8 +22,7 @@ export default function SocialMedia() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-        const res = await axios.get(`${apiUrl}/settings/social-media`);
+        const res = await axiosInstance.get(`/settings/social-media`);
         if (res.data?.links) {
           setLinks(prev => ({ ...prev, ...res.data.links }));
         }
@@ -40,8 +39,7 @@ export default function SocialMedia() {
   const handleSaveLinks = async () => {
     setIsSaving(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      await axios.post(`${apiUrl}/settings/social-media`, { links });
+      await axiosInstance.post(`/settings/social-media`, { links });
       toast({ variant: "success" as any, description: 'Successfully updated Social Media Links.' });
     } catch (err) {
       console.error('Error saving Links:', err);

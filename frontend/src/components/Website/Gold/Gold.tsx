@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import axiosInstance from '@/lib/axios';
 import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp, Clock, ExternalLink, Newspaper, AlertCircle, LayoutGrid, List } from "lucide-react";
 
@@ -121,8 +122,7 @@ export default function Gold() {
   useEffect(() => {
     const load = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-        const kr = await axios.get(`${apiUrl}/settings/news-api-key`, { timeout: 3000, validateStatus: s => s < 500 });
+        const kr = await axiosInstance.get(`/settings/news-api-key`);
         const key = kr.data?.apiKey;
         if (key) {
           const res = await axios.get("https://eventregistry.org/api/v1/article/getArticles", {

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import {
   Send, Check, AlertCircle,
   Building2, MapPin, Phone, Mail, Clock, Globe
@@ -23,8 +23,7 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-        const res = await axios.get(`${apiUrl}/settings/general-info`);
+        const res = await axiosInstance.get(`/settings/general-info`);
         if (res.data?.info) setGeneralInfo(res.data.info);
       } catch (err) {
         console.warn('Could not load general info:', err);
@@ -65,17 +64,7 @@ export default function ContactPage() {
     setErrorMessage('');
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      console.log('Submitting enquiry to:', `${apiUrl}/enquiries`);
-      console.log('Form data:', formData);
-      
-      const response = await axios.post(`${apiUrl}/enquiries`, formData, {
-        timeout: 30000, // 30 second timeout
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
+      const response = await axiosInstance.post(`/enquiries`, formData);
       
       console.log('Enquiry response:', response.data);
       setStatus('success');

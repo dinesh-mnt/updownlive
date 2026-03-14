@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import { Building2, MapPin, Phone, Mail, Save, Loader2, Info } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/Card";
 import { useToast } from "@/hooks/use-toast";
@@ -32,8 +32,7 @@ export default function GeneralInformation() {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-        const res = await axios.get(`${apiUrl}/settings/general-info`);
+        const res = await axiosInstance.get(`/settings/general-info`);
         if (res.data?.info) {
           setInfo(prev => ({ ...prev, ...res.data.info }));
         }
@@ -50,8 +49,7 @@ export default function GeneralInformation() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      await axios.post(`${apiUrl}/settings/general-info`, { info });
+      await axiosInstance.post(`/settings/general-info`, { info });
       toast({ variant: "success" as any, description: 'General information updated successfully.' });
     } catch (err) {
       console.error('Error saving general info:', err);

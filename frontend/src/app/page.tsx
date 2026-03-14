@@ -1,6 +1,7 @@
 import React from "react";
 import Home from "@/components/Website/Home/Home";
 import axios from "axios";
+import axiosInstance from '@/lib/axios';
 import TopAd from "@/components/TopAd";
 import Navbar from "@/components/Website/Header/Header";
 import MarketTicker from "@/components/MarketTicker";
@@ -13,19 +14,11 @@ export async function generateMetadata() {
 
 async function getTopNews() {
   let API_KEY = "";
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-  
+
   try {
-    const configRes = await axios.get(
-      `${apiUrl}/settings/news-api-key`,
-      {
-        timeout: 5000,
-        validateStatus: (status) => status < 500,
-      }
-    );
+    const configRes = await axiosInstance.get(`/settings/news-api-key`);
     if (configRes.data?.apiKey) API_KEY = configRes.data.apiKey;
   } catch (e) {
-    // Backend is likely not running — skip news fetch gracefully
     console.warn("Could not reach backend for news API key:", (e as Error).message);
     return [];
   }

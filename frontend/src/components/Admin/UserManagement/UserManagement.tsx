@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/UI/Button';
 import { Badge } from '@/components/UI/Badge';
 import { Eye, CheckCircle, XCircle, Loader2, User as UserIcon, Shield, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -20,8 +20,7 @@ export default function UserManagement() {
 
     const fetchUsers = async () => {
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-            const res = await axios.get(`${apiUrl}/users`);
+            const res = await axiosInstance.get(`/users`);
             setUsers(res.data);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -42,8 +41,7 @@ export default function UserManagement() {
     const handleUpdateStatus = async (userId: string, status: 'approved' | 'rejected') => {
         setIsUpdating(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-            await axios.patch(`${apiUrl}/users/${userId}/status`, { status });
+            await axiosInstance.patch(`/users/${userId}/status`, { status });
             toast({
                 title: 'Status Updated',
                 description: `User account has been ${status === 'approved' ? 'approved' : 'rejected'}.`,

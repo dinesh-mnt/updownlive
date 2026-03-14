@@ -6,7 +6,7 @@ import {
   TrendingUp, Users, Activity, Loader2, Eye, EyeOff, Save, Key, CheckCircle
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
-import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 
 export default function AdminDashboard() {
   const [profile, setProfile] = useState<any>(null);
@@ -31,9 +31,8 @@ export default function AdminDashboard() {
         setProfile(sessionData.user);
         
         // Fetch Current API Key
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
         try {
-          const res = await axios.get(`${apiUrl}/settings/news-api-key`);
+          const res = await axiosInstance.get(`/settings/news-api-key`);
           if (res.data?.apiKey) {
             setNewsApiKey(res.data.apiKey);
           }
@@ -63,8 +62,7 @@ export default function AdminDashboard() {
   const handleSaveApiKey = async () => {
     setIsSaving(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      await axios.post(`${apiUrl}/settings/news-api-key`, { apiKey: newsApiKey });
+      await axiosInstance.post(`/settings/news-api-key`, { apiKey: newsApiKey });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {

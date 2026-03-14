@@ -1,9 +1,6 @@
 import Enquiry from '../models/Enquiry.js';
 import { sendEmail } from '../config/emailService.js';
 
-import Enquiry from '../models/Enquiry.js';
-import { sendEmail } from '../config/emailService.js';
-
 export const submitEnquiry = async (req, res) => {
   try {
     console.log('📝 Enquiry submission received:', {
