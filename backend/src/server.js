@@ -161,5 +161,5 @@ if (process.env.NODE_ENV !== 'test' && process.env.VERCEL !== '1') {
   });
 }
 
-// Still need to export for Vercel functions
+// Export for Vercel functions
 export default app;

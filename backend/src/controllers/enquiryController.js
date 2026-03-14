@@ -1,8 +1,16 @@
 import Enquiry from '../models/Enquiry.js';
 import { sendEmail } from '../config/emailService.js';
+import mongoose from 'mongoose';
 
 export const submitEnquiry = async (req, res) => {
   try {
+    // Ensure database connection in serverless environment
+    if (mongoose.connection.readyState !== 1) {
+      console.log('🔄 Database not connected, attempting to connect...');
+      const connectDB = (await import('../config/db.js')).default;
+      await connectDB();
+    }
+
     console.log('📝 Enquiry submission received:', {
       department: req.body.department,
       email: req.body.email,
@@ -79,11 +87,37 @@ export const submitEnquiry = async (req, res) => {
 
 export const getEnquiries = async (req, res) => {
   try {
+    // Ensure database connection in serverless environment
+    if (mongoose.connection.readyState !== 1) {
+      console.log('🔄 Database not connected, attempting to connect...');
+      const connectDB = (await import('../config/db.js')).default;
+      await connectDB();
+    }
+
+    console.log('📋 Fetching enquiries from database...');
     const enquiries = await Enquiry.find().sort({ createdAt: -1 });
+    console.log(`✅ Found ${enquiries.length} enquiries`);
+    
     res.status(200).json({ success: true, count: enquiries.length, data: enquiries });
   } catch (error) {
-    console.error('Error fetching enquiries:', error);
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    console.error('❌ Error fetching enquiries:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Server error';
+    if (error.name === 'ValidationError') {
+      errorMessage = 'Invalid data provided';
+    } else if (error.name === 'MongoError' || error.name === 'MongoServerError') {
+      errorMessage = 'Database error';
+    } else if (error.name === 'MongooseError') {
+      errorMessage = 'Database connection error';
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: errorMessage, 
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 };
 
