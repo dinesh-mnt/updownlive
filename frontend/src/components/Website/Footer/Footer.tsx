@@ -37,7 +37,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-black border-t border-gray-900 pt-16 mt-16 font-sans text-white">
+    <footer className="bg-white dark:bg-black border-t border-gray-200 dark:border-gray-900 pt-16 mt-16 font-sans text-black dark:text-white">
       <div className="max-w-7xl mx-auto px-6 mb-12">
         
         {/* Top section: Links, Newsletter, Social */}
@@ -46,35 +46,35 @@ export default function Footer() {
           {/* Logo & Links columns */}
           <div className="md:col-span-6 lg:col-span-4">
             <h3 className="text-3xl font-extrabold mb-8 flex items-center gap-1">
-              <span className="text-brand-blue">Up</span><span className="text-white">Down</span><span className="text-brand-red">Live</span>
+              <span className="text-brand-blue">Up</span><span className="text-black dark:text-white">Down</span><span className="text-brand-red">Live</span>
             </h3>
             
             <div className="flex gap-x-12">
               <ul className="flex flex-col gap-4">
-                <li><Link href="/about" className="text-gray-400 font-medium hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="text-gray-400 font-medium hover:text-white transition-colors">Contact Us</Link></li>
-                <li><Link href="/advertise" className="text-gray-400 font-medium hover:text-white transition-colors">Advertise with Us</Link></li>
-                <li><Link href="/newsletter" className="text-gray-400 font-medium hover:text-white transition-colors">Newsletter</Link></li>
-                <li><Link href="/live" className="text-gray-400 font-medium hover:text-white transition-colors">Live Feed</Link></li>
+                <li><Link href="/about" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="/contact" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link href="/advertise" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Advertise with Us</Link></li>
+                <li><Link href="/newsletter" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Newsletter</Link></li>
+                <li><Link href="/live" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Live Feed</Link></li>
               </ul>
               <ul className="flex flex-col gap-4">
-                <li><Link href="/finance" className="text-gray-400 font-medium hover:text-white transition-colors">Finance News</Link></li>
-                <li><Link href="/education" className="text-gray-400 font-medium hover:text-white transition-colors">Education Center</Link></li>
-                <li><Link href="/certified" className="text-gray-400 font-medium hover:text-white transition-colors">Get Certified</Link></li>
-                <li><Link href="/brokers" className="text-gray-400 font-medium hover:text-white transition-colors">Find a Broker</Link></li>
-                <li><Link href="/events" className="text-gray-400 font-medium hover:text-white transition-colors">Events</Link></li>
+                <li><Link href="/finance" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Finance News</Link></li>
+                <li><Link href="/education" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Education Center</Link></li>
+                <li><Link href="/certified" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Get Certified</Link></li>
+                <li><Link href="/brokers" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Find a Broker</Link></li>
+                <li><Link href="/events" className="text-gray-600 dark:text-gray-400 font-medium hover:text-black dark:hover:text-white transition-colors">Events</Link></li>
               </ul>
             </div>
           </div>
 
           {/* Newsletter Subscribe */}
-          <div className="md:col-span-6 lg:col-span-5 border-y md:border-y-0 md:border-l border-gray-800 py-8 md:py-0 md:pl-8 lg:pl-12">
-            <h4 className="text-xl font-bold mb-6 text-white tracking-wide">Subscribe to our Daily News Wrap</h4>
+          <div className="md:col-span-6 lg:col-span-5 border-y md:border-y-0 md:border-l border-gray-200 dark:border-gray-800 py-8 md:py-0 md:pl-8 lg:pl-12">
+            <h4 className="text-xl font-bold mb-6 text-black dark:text-white tracking-wide">Subscribe to our Daily News Wrap</h4>
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <input 
                 type="email" 
                 placeholder="Enter your email address" 
-                className="w-full bg-gray-900 border border-gray-800 text-white placeholder-gray-500 px-4 py-3 rounded focus:outline-none focus:ring-1 focus:ring-brand-blue transition-all font-medium"
+                className="w-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-black dark:text-white placeholder-gray-500 px-4 py-3 rounded focus:outline-none focus:ring-1 focus:ring-brand-blue transition-all font-medium"
               />
               <button className="bg-brand-blue text-white px-8 py-3 rounded font-bold hover:bg-blue-600 shadow-md hover:shadow-lg transition-all whitespace-nowrap">
                 Subscribe
@@ -83,7 +83,7 @@ export default function Footer() {
             
             <label className="flex items-start gap-3 cursor-pointer group mb-6">
               <div className="relative flex items-center mt-1">
-                <input type="checkbox" className="w-4 h-4 rounded border-gray-700 text-brand-blue focus:ring-brand-blue bg-gray-900 focus:ring-offset-gray-900" />
+                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-brand-blue focus:ring-brand-blue bg-white dark:bg-gray-900 focus:ring-offset-white dark:focus:ring-offset-gray-900" />
               </div>
               <span className="text-xs text-gray-500 leading-relaxed">
                 By submitting my contact details and message above, I acknowledge and agree to the UpDownLive <Link href="/terms" className="text-brand-blue hover:text-blue-400 transition-colors underline">Terms of Service</Link>
@@ -97,9 +97,9 @@ export default function Footer() {
 
           {/* Follow Us */}
           <div className="md:col-span-12 lg:col-span-3 lg:pl-8 flex flex-col justify-center lg:justify-start">
-            <h4 className="text-xl font-bold mb-6 text-white tracking-wide">Follow Us</h4>
+            <h4 className="text-xl font-bold mb-6 text-black dark:text-white tracking-wide">Follow Us</h4>
             <div className="flex flex-wrap gap-3">
-               <Link href={socialLinks.twitter} className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all" aria-label="Twitter"><Twitter size={18} /></Link>
+               <Link href={socialLinks.twitter} className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all" aria-label="Twitter"><Twitter size={18} /></Link>
                <Link href={socialLinks.telegram} className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:border-white transition-all" aria-label="Telegram"><Send size={18} /></Link>
                <Link href={socialLinks.youtube} className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all" aria-label="YouTube"><Youtube size={18} /></Link>
                <Link href={socialLinks.facebook} className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all" aria-label="Facebook"><Facebook size={18} /></Link>
@@ -112,7 +112,7 @@ export default function Footer() {
         </div>
 
         {/* Horizontal Divider */}
-        <div className="w-full h-px bg-gray-900 my-10 hidden md:block"></div>
+        <div className="w-full h-px bg-gray-200 dark:bg-gray-900 my-10 hidden md:block"></div>
 
         {/* Warnings Section */}
         <div className="flex flex-col gap-5 text-xs text-gray-500 leading-relaxed text-justify mt-8 md:mt-0 max-w-none">
@@ -130,16 +130,16 @@ export default function Footer() {
       </div>
       
       {/* Bottom Legal */}
-      <div className="border-t border-gray-900 py-6 text-gray-500 text-xs font-medium bg-black mt-10">
+      <div className="border-t border-gray-200 dark:border-gray-900 py-6 text-gray-600 dark:text-gray-500 text-xs font-medium bg-gray-50 dark:bg-black mt-10">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p>&copy; {new Date().getFullYear()} UpDownLive Limited — Part of Ultimate Group</p>
           <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
              <span>Read our</span>
-             <Link href="/terms" className="hover:text-white transition-colors underline underline-offset-4 decoration-gray-700 hover:decoration-white">Terms</Link> 
-             <Link href="/cookies" className="hover:text-white transition-colors underline underline-offset-4 decoration-gray-700 hover:decoration-white">Cookies</Link> and 
-             <Link href="/privacy" className="hover:text-white transition-colors underline underline-offset-4 decoration-gray-700 hover:decoration-white">Privacy Notice</Link>
+             <Link href="/terms" className="hover:text-black dark:hover:text-white transition-colors underline underline-offset-4 decoration-gray-300 dark:decoration-gray-700 hover:decoration-black dark:hover:decoration-white">Terms</Link> 
+             <Link href="/cookies" className="hover:text-black dark:hover:text-white transition-colors underline underline-offset-4 decoration-gray-300 dark:decoration-gray-700 hover:decoration-black dark:hover:decoration-white">Cookies</Link> and 
+             <Link href="/privacy" className="hover:text-black dark:hover:text-white transition-colors underline underline-offset-4 decoration-gray-300 dark:decoration-gray-700 hover:decoration-black dark:hover:decoration-white">Privacy Notice</Link>
           </div>
-          <Link href="/manage-cookies" className="text-gray-400 hover:text-white transition-colors font-semibold">Manage Cookies</Link>
+          <Link href="/manage-cookies" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors font-semibold">Manage Cookies</Link>
         </div>
       </div>
     </footer>

@@ -54,6 +54,23 @@ const API_CONFIGS: ApiKeyConfig[] = [
     ],
   },
   {
+    id: "forexNews",
+    label: "MarketAux API (Forex News)",
+    endpoint: "forex-news-api-key",
+    placeholder: "Paste your MarketAux API key…",
+    description: "Powers the /forex page with real-time forex market news and analysis articles.",
+    docUrl: "https://www.marketaux.com/documentation",
+    docLabel: "MarketAux Docs",
+    tag: "Forex News",
+    tagColor: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+    instructions: [
+      "1. Sign up free at marketaux.com.",
+      "2. Copy your API key from the dashboard.",
+      "3. Free plan: 100 requests/day.",
+      "4. API endpoint used: GET /v1/news/all",
+    ],
+  },
+  {
     id: "crypto",
     label: "CoinGecko API (Crypto)",
     endpoint: "crypto-api-key",
@@ -131,46 +148,46 @@ export default function ApiIntegration() {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center py-20">
+    <div className="flex items-center justify-center py-20 transition-colors duration-300">
       <Loader2 size={32} className="animate-spin text-brand-blue" />
     </div>
   );
 
   return (
     <>
-      <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-brand-black mb-2 tracking-tight">
+      <div className="mb-10 animate-in fade-in duration-500">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-brand-black dark:text-white mb-2 tracking-tight">
           API Integrations & Webhooks
         </h1>
-        <p className="text-brand-gray text-lg">
+        <p className="text-brand-gray dark:text-gray-400 text-lg">
           Manage all third-party API keys. Each key powers a specific page on the website. All keys are stored securely in MongoDB.
         </p>
       </div>
 
       <div className="flex flex-col gap-6">
         {API_CONFIGS.map((cfg) => (
-          <Card key={cfg.id} className="rounded-3xl border-brand-border shadow-sm">
-            <CardHeader className="border-b border-brand-border bg-brand-light/50 rounded-t-3xl px-8 py-6">
+          <Card key={cfg.id} className="rounded-3xl border-brand-border dark:border-white/10 shadow-sm bg-white dark:bg-zinc-900 transition-colors duration-300">
+            <CardHeader className="border-b border-brand-border dark:border-white/10 bg-brand-light/50 dark:bg-white/5 rounded-t-3xl px-8 py-6">
               <div className="flex items-center justify-between flex-wrap gap-3">
-                <CardTitle className="flex items-center gap-2 text-xl font-bold">
+                <CardTitle className="flex items-center gap-2 text-xl font-bold text-brand-black dark:text-white">
                   <Key size={22} className="text-brand-blue" /> {cfg.label}
                 </CardTitle>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${cfg.tagColor}`}>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${cfg.tagColor} transition-colors`}>
                   {cfg.tag}
                 </span>
               </div>
-              <CardDescription className="mt-1">{cfg.description}</CardDescription>
+              <CardDescription className="mt-1 text-brand-gray dark:text-gray-400">{cfg.description}</CardDescription>
             </CardHeader>
 
             <CardContent className="p-8">
               {/* Step-by-step instructions */}
-              <div className="bg-brand-blue/5 border border-brand-blue/20 rounded-2xl p-5 mb-6">
+              <div className="bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/20 dark:border-brand-blue/30 rounded-2xl p-5 mb-6 transition-colors">
                 <p className="text-xs font-bold text-brand-blue uppercase tracking-widest flex items-center gap-2 mb-3">
                   <Info size={14} /> How to get your API key
                 </p>
                 <ol className="space-y-1">
                   {cfg.instructions.map((step, i) => (
-                    <li key={i} className="text-sm text-brand-gray leading-relaxed">{step}</li>
+                    <li key={i} className="text-sm text-brand-gray dark:text-gray-400 leading-relaxed transition-colors">{step}</li>
                   ))}
                 </ol>
                 <a
@@ -186,7 +203,7 @@ export default function ApiIntegration() {
               {/* Key input + save */}
               <div className="flex flex-col md:flex-row gap-4 items-end">
                 <div className="flex-1 w-full relative">
-                  <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">
+                  <label className="block text-xs font-bold text-brand-gray dark:text-gray-400 uppercase tracking-widest mb-2 transition-colors">
                     API Key
                   </label>
                   <div className="relative">
@@ -194,12 +211,12 @@ export default function ApiIntegration() {
                       type={show[cfg.id] ? "text" : "password"}
                       value={keys[cfg.id] || ''}
                       onChange={(e) => setKeys(k => ({ ...k, [cfg.id]: e.target.value }))}
-                      className="w-full bg-white border border-brand-border text-brand-black px-4 py-3 pr-12 rounded-xl focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-medium font-mono"
+                      className="w-full bg-white dark:bg-zinc-800 border border-brand-border dark:border-white/10 text-brand-black dark:text-white px-4 py-3 pr-12 rounded-xl focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-medium font-mono"
                       placeholder={cfg.placeholder}
                     />
                     <button
                       onClick={() => setShow(s => ({ ...s, [cfg.id]: !s[cfg.id] }))}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-gray hover:text-brand-blue transition-colors focus:outline-none"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-gray dark:text-gray-500 hover:text-brand-blue transition-colors focus:outline-none"
                     >
                       {show[cfg.id] ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>

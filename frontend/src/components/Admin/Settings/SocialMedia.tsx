@@ -67,27 +67,27 @@ export default function SocialMedia() {
 
   return (
     <>
-      <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-brand-black mb-2 tracking-tight">Social Media Settings</h1>
-        <p className="text-brand-gray text-lg">Manage your dynamic social media links for the website footer.</p>
+      <div className="mb-10 animate-in fade-in duration-500">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-brand-black dark:text-white mb-2 tracking-tight">Social Media Settings</h1>
+        <p className="text-brand-gray dark:text-gray-400 text-lg italic">Manage your dynamic social media links for the website footer.</p>
       </div>
 
-      <Card className="rounded-3xl border-brand-border shadow-sm">
-        <CardHeader className="border-b border-brand-border bg-brand-light/50 rounded-t-3xl px-8 py-6">
-          <CardTitle className="flex items-center gap-2 text-xl font-bold">
+      <Card className="rounded-3xl border-brand-border dark:border-white/10 shadow-sm bg-white dark:bg-zinc-900 transition-colors duration-300">
+        <CardHeader className="border-b border-brand-border dark:border-white/10 bg-brand-light/50 dark:bg-white/5 rounded-t-3xl px-8 py-6">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold text-brand-black dark:text-white">
             <Share2 size={22} className="text-brand-blue" /> Dynamic Profile Links
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-brand-gray dark:text-gray-400">
             These links are automatically reflected on the user-facing website footer.
           </CardDescription>
         </CardHeader>
         
         <CardContent className="p-8">
-          <div className="bg-brand-blue/5 border border-brand-blue/20 rounded-2xl p-6 mb-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/20 dark:border-brand-blue/30 rounded-2xl p-6 mb-2 grid grid-cols-1 lg:grid-cols-2 gap-6 transition-colors">
             
             {socialFields.map(field => (
               <div key={field.name} className="flex-1 w-full relative">
-                <label className="flex items-center gap-2 text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">
+                <label className="flex items-center gap-2 text-xs font-bold text-brand-gray dark:text-gray-400 uppercase tracking-widest mb-2 transition-colors">
                   <field.icon size={14} className={field.color} /> {field.label} URL
                 </label>
                 <div className="relative">
@@ -96,7 +96,7 @@ export default function SocialMedia() {
                     name={field.name}
                     value={links[field.name as keyof typeof links] || ''}
                     onChange={handleChange}
-                    className="w-full bg-white border border-brand-border text-brand-black px-4 py-3 rounded-xl focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-medium font-mono"
+                    className="w-full bg-white dark:bg-zinc-800 border border-brand-border dark:border-white/10 text-brand-black dark:text-white px-4 py-3 rounded-xl focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-medium font-mono placeholder:text-brand-gray dark:placeholder:text-gray-500"
                     placeholder={`https://${field.name}.com/yourprofile`}
                   />
                 </div>

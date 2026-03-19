@@ -62,12 +62,12 @@ async function getTopNews() {
 export default async function Page() {
   const news = await getTopNews();
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
       <TopAd />
       <Navbar />
       <MarketTicker />
       <Home news={news} />
       <Footer />
-    </>
+    </div>
   );
 }

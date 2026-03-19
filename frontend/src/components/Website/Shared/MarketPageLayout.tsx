@@ -50,22 +50,22 @@ export default function MarketPageLayout<T>({
   }, [searchQuery]);
 
   return (
-    <div className="bg-white min-h-screen font-sans">
+    <div className="bg-white dark:bg-black min-h-screen font-sans">
       {/* Header Section */}
-      <div className="bg-linear-to-br from-brand-light via-white to-blue-50 border-b border-brand-border">
+      <div className="bg-linear-to-br from-brand-light dark:from-zinc-900/50 via-white dark:via-black to-blue-50 dark:to-zinc-900/50 border-b border-brand-border dark:border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
             {/* Icon */}
-            <div className={`p-4 rounded-2xl bg-white border border-brand-border shadow-lg ${accentColor}`}>
+            <div className={`p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 shadow-lg ${accentColor}`}>
               {icon}
             </div>
             
             {/* Title and Subtitle */}
             <div className="flex-1">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-brand-black tracking-tight mb-4">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-brand-black dark:text-white tracking-tight mb-4">
                 {title}
               </h1>
-              <p className="text-lg text-brand-gray leading-relaxed max-w-3xl">
+              <p className="text-lg text-brand-gray dark:text-gray-400 leading-relaxed max-w-3xl">
                 {subtitle}
               </p>
             </div>
@@ -84,18 +84,18 @@ export default function MarketPageLayout<T>({
               placeholder={`Search ${title.toLowerCase()}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-brand-border bg-white text-brand-black placeholder:text-brand-gray focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 transition-all"
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-brand-border dark:border-white/10 bg-white dark:bg-zinc-900 text-brand-black dark:text-white placeholder:text-brand-gray dark:placeholder:text-gray-500 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 transition-all"
             />
           </div>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2 bg-brand-light border border-brand-border rounded-xl p-1">
+          <div className="flex items-center gap-2 bg-brand-light dark:bg-zinc-900 border border-brand-border dark:border-white/10 rounded-xl p-1">
             <button
               onClick={() => setViewMode("grid")}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                 viewMode === "grid"
-                  ? "bg-white text-brand-blue shadow-sm"
-                  : "text-brand-gray hover:text-brand-black"
+                  ? "bg-white dark:bg-zinc-800 text-brand-blue shadow-sm"
+                  : "text-brand-gray dark:text-gray-400 hover:text-brand-black dark:hover:text-white"
               }`}
             >
               <Grid3X3 size={16} />
@@ -105,8 +105,8 @@ export default function MarketPageLayout<T>({
               onClick={() => setViewMode("list")}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                 viewMode === "list"
-                  ? "bg-white text-brand-blue shadow-sm"
-                  : "text-brand-gray hover:text-brand-black"
+                  ? "bg-white dark:bg-zinc-800 text-brand-blue shadow-sm"
+                  : "text-brand-gray dark:text-gray-400 hover:text-brand-black dark:hover:text-white"
               }`}
             >
               <List size={16} />
@@ -117,7 +117,7 @@ export default function MarketPageLayout<T>({
 
         {/* Results Count */}
         <div className="mb-6">
-          <p className="text-sm text-brand-gray">
+          <p className="text-sm text-brand-gray dark:text-gray-500">
             {loading ? (
               "Loading..."
             ) : error ? (
@@ -135,10 +135,10 @@ export default function MarketPageLayout<T>({
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-brand-light rounded-2xl p-6 animate-pulse">
-                <div className="h-4 bg-brand-border rounded mb-4"></div>
-                <div className="h-6 bg-brand-border rounded mb-2"></div>
-                <div className="h-4 bg-brand-border rounded w-3/4"></div>
+              <div key={i} className="bg-brand-light dark:bg-zinc-900 rounded-2xl p-6 animate-pulse">
+                <div className="h-4 bg-brand-border dark:bg-zinc-800 rounded mb-4"></div>
+                <div className="h-6 bg-brand-border dark:bg-zinc-800 rounded mb-2"></div>
+                <div className="h-4 bg-brand-border dark:bg-zinc-800 rounded w-3/4"></div>
               </div>
             ))}
           </div>
@@ -147,16 +147,16 @@ export default function MarketPageLayout<T>({
             <div className="w-20 h-20 rounded-2xl bg-brand-light border border-brand-border flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">⚠️</span>
             </div>
-            <h3 className="text-xl font-bold text-brand-black mb-2">Something went wrong</h3>
-            <p className="text-brand-gray">{error}</p>
+            <h3 className="text-xl font-bold text-brand-black dark:text-white mb-2">Something went wrong</h3>
+            <p className="text-brand-gray dark:text-gray-400">{error}</p>
           </div>
         ) : paginatedItems.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-2xl bg-brand-light border border-brand-border flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 rounded-2xl bg-brand-light dark:bg-zinc-900 border border-brand-border dark:border-white/10 flex items-center justify-center mx-auto mb-4">
               <Search size={32} className="text-brand-gray" />
             </div>
-            <h3 className="text-xl font-bold text-brand-black mb-2">No results found</h3>
-            <p className="text-brand-gray">
+            <h3 className="text-xl font-bold text-brand-black dark:text-white mb-2">No results found</h3>
+            <p className="text-brand-gray dark:text-gray-400">
               {searchQuery
                 ? `No items match "${searchQuery}". Try adjusting your search.`
                 : "No items available at the moment."}
@@ -185,7 +185,7 @@ export default function MarketPageLayout<T>({
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-border bg-white text-brand-gray hover:text-brand-black hover:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-border dark:border-white/10 bg-white dark:bg-zinc-900 text-brand-gray dark:text-gray-400 hover:text-brand-black dark:hover:text-white hover:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <ChevronLeft size={16} />
                   Previous
@@ -211,7 +211,7 @@ export default function MarketPageLayout<T>({
                         className={`w-10 h-10 rounded-lg text-sm font-bold transition-all ${
                           currentPage === pageNum
                             ? "bg-brand-blue text-white"
-                            : "bg-white border border-brand-border text-brand-gray hover:text-brand-black hover:border-brand-blue"
+                            : "bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 text-brand-gray dark:text-gray-400 hover:text-brand-black dark:hover:text-white hover:border-brand-blue"
                         }`}
                       >
                         {pageNum}
@@ -223,7 +223,7 @@ export default function MarketPageLayout<T>({
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-border bg-white text-brand-gray hover:text-brand-black hover:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-border dark:border-white/10 bg-white dark:bg-zinc-900 text-brand-gray dark:text-gray-500 hover:text-brand-black dark:hover:text-white hover:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   Next
                   <ChevronRight size={16} />

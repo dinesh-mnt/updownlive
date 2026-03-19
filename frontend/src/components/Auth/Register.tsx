@@ -171,17 +171,17 @@ export default function RegisterPage() {
       <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
 
       {/* Register Card */}
-      <div className="w-full max-w-6xl relative z-10">
-        <div className="bg-white/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-6xl relative z-10 transition-colors duration-300">
+        <div className="bg-white/95 dark:bg-zinc-900/90 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden transition-colors duration-300">
           <div className="grid md:grid-cols-2 gap-0">
             {/* Left Side - Register Form */}
             <div className="p-12">
               {/* Header Section */}
               <div className="mb-8">
-                <h2 className="text-3xl font-bold text-brand-black mb-2">
+                <h2 className="text-3xl font-bold text-brand-black dark:text-white mb-2">
                   Create Account
                 </h2>
-                <p className="text-brand-gray text-sm">
+                <p className="text-brand-gray dark:text-gray-400 text-sm italic">
                   Sign up to get started with UpDownLive
                 </p>
               </div>
@@ -197,7 +197,7 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="name"
-                    className="block text-sm font-semibold text-brand-black mb-2"
+                    className="block text-sm font-semibold text-brand-black dark:text-white mb-2"
                   >
                     Full Name
                   </label>
@@ -211,7 +211,7 @@ export default function RegisterPage() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-white/80 border border-gray-200 rounded-2xl text-brand-black placeholder-brand-gray focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 outline-none transition-all duration-300 font-medium backdrop-blur-sm"
+                      className="w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-zinc-800/80 border border-gray-200 dark:border-white/10 rounded-2xl text-brand-black dark:text-white placeholder-brand-gray dark:placeholder:text-gray-500 focus:bg-white dark:focus:bg-zinc-800 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 outline-none transition-all duration-300 font-medium backdrop-blur-sm"
                       placeholder="Enter your full name"
                     />
                   </div>
@@ -220,7 +220,7 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-semibold text-brand-black mb-2"
+                    className="block text-sm font-semibold text-brand-black dark:text-white mb-2"
                   >
                     Email Address
                   </label>
@@ -234,7 +234,7 @@ export default function RegisterPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-white/80 border border-gray-200 rounded-2xl text-brand-black placeholder-brand-gray focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 outline-none transition-all duration-300 font-medium backdrop-blur-sm"
+                      className="w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-zinc-800/80 border border-gray-200 dark:border-white/10 rounded-2xl text-brand-black dark:text-white placeholder-brand-gray dark:placeholder:text-gray-500 focus:bg-white dark:focus:bg-zinc-800 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 outline-none transition-all duration-300 font-medium backdrop-blur-sm"
                       placeholder="Enter your email"
                     />
                   </div>
@@ -243,12 +243,12 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="password"
-                    className="block text-sm font-semibold text-brand-black mb-2"
+                    className="block text-sm font-semibold text-brand-black dark:text-white mb-2"
                   >
                     Password
                   </label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gray group-focus-within:text-brand-blue transition-colors">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gray dark:text-gray-500 group-focus-within:text-brand-blue transition-colors">
                       <Lock size={20} />
                     </div>
                     <input
@@ -257,13 +257,13 @@ export default function RegisterPage() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-12 py-4 bg-white/80 border border-gray-200 rounded-2xl text-brand-black placeholder-brand-gray focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 outline-none transition-all duration-300 font-medium backdrop-blur-sm"
+                      className="w-full pl-12 pr-12 py-4 bg-white/80 dark:bg-zinc-800/80 border border-gray-200 dark:border-white/10 rounded-2xl text-brand-black dark:text-white placeholder-brand-gray dark:placeholder:text-gray-500 focus:bg-white dark:focus:bg-zinc-800 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 outline-none transition-all duration-300 font-medium backdrop-blur-sm"
                       placeholder="Create a strong password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-gray hover:text-brand-blue transition-colors focus:outline-none"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-gray dark:text-gray-500 hover:text-brand-blue transition-colors focus:outline-none"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -290,10 +290,10 @@ export default function RegisterPage() {
 
                 <div className="relative py-4">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
+                    <div className="w-full border-t border-gray-300 dark:border-white/10"></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-white px-4 text-sm text-brand-gray font-medium">
+                    <span className="bg-white dark:bg-zinc-900 px-4 text-sm text-brand-gray dark:text-gray-400 font-medium transition-colors">
                       Or continue with
                     </span>
                   </div>
@@ -303,7 +303,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={loading || googleLoading}
-                  className="w-full bg-white/90 hover:bg-white text-brand-black font-semibold py-4 rounded-2xl border border-gray-200 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:-translate-y-1 transform backdrop-blur-sm"
+                  className="w-full bg-white/90 dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-700 text-brand-black dark:text-white font-semibold py-4 rounded-2xl border border-gray-200 dark:border-white/10 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:-translate-y-1 transform backdrop-blur-sm"
                 >
                   {googleLoading ? (
                     <div className="flex items-center justify-center gap-3">
@@ -337,8 +337,8 @@ export default function RegisterPage() {
               </form>
 
               {/* Footer */}
-              <div className="mt-8 text-center">
-                <p className="text-sm text-brand-gray">
+              <div className="mt-8 text-center transition-colors">
+                <p className="text-sm text-brand-gray dark:text-gray-400">
                   Already have an account?{" "}
                   <Link
                     href="/admin/login"
@@ -351,7 +351,7 @@ export default function RegisterPage() {
             </div>
 
             {/* Right Side - Company Details */}
-            <div className="bg-brand-black p-12 flex flex-col justify-center text-white relative overflow-hidden">
+            <div className="bg-brand-black dark:bg-black p-12 flex flex-col justify-center text-white relative overflow-hidden transition-colors">
               {/* Decorative Elements */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>

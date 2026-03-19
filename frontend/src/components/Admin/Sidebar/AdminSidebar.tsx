@@ -97,17 +97,21 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className="flex h-full w-64 shrink-0 flex-col font-outfit bg-brand-black border-r border-white/10 shadow-sm z-40 text-white">
+    <div className="flex h-full w-64 shrink-0 flex-col font-outfit bg-white dark:bg-brand-black border-r border-brand-border dark:border-white/10 shadow-sm z-40 text-brand-black dark:text-white transition-colors duration-300">
       {/* Logo Header */}
-      <div className="flex px-4 py-5 border-b border-white/10 items-center justify-center">
+      <div className="flex px-4 py-5 border-b border-brand-border dark:border-white/10 items-center justify-center">
         <Link href="/admin/dashboard" className="flex items-center justify-center w-full rounded-lg p-2 shadow-sm hover:opacity-90 transition-opacity">
-          <img src="/assets/logo/image.png" alt="UpDownLive Logo" className="h-32 w-24 object-contain" />
+          <h1 className="text-2xl font-black tracking-tighter flex items-center">
+            <span className="text-brand-blue">Up</span>
+            <span className="text-brand-black dark:text-white">Down</span>
+            <span className="text-brand-red">Live</span>
+          </h1>
         </Link>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
-        <div className="px-3 mb-3 mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+        <div className="px-3 mb-3 mt-1 text-[10px] font-bold uppercase tracking-widest text-brand-gray dark:text-gray-400">
           Platform Control
         </div>
         
@@ -118,7 +122,7 @@ export default function AdminSidebar() {
           // If item has href, render as single link
           if (item.href) {
             const itemIsActive = isMainItemActive(item.href);
-``
+
             return (
               <Link
                 key={item.title}
@@ -126,14 +130,14 @@ export default function AdminSidebar() {
                 className={cn(
                   "w-full flex items-center px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 group mb-1",
                   itemIsActive
-                    ? "bg-white text-gray-800 shadow-sm"
-                    : "text-gray-300 hover:bg-white/10 hover:text-white",
+                    ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20"
+                    : "text-brand-gray dark:text-gray-300 hover:bg-brand-blue/10 hover:text-brand-blue dark:hover:bg-white/10 dark:hover:text-white",
                 )}
               >
                 <Icon
                   className={cn(
                     "mr-3 h-[18px] w-[18px] transition-colors",
-                    itemIsActive ? "text-gray-800" : "text-gray-400 group-hover:text-white",
+                    itemIsActive ? "text-white" : "text-brand-gray dark:text-gray-400 group-hover:text-brand-blue dark:group-hover:text-white",
                   )}
                 />
                 <span>{item.title}</span>
@@ -152,8 +156,8 @@ export default function AdminSidebar() {
                 className={cn(
                   "w-full flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 group",
                   parentHasActiveChild
-                    ? "bg-white/10 text-white"
-                    : "text-gray-300 hover:bg-white/10 hover:text-white",
+                    ? "bg-brand-blue/10 dark:bg-white/10 text-brand-blue dark:text-white"
+                    : "text-brand-gray dark:text-gray-300 hover:bg-brand-blue/10 hover:text-brand-blue dark:hover:bg-white/10 dark:hover:text-white",
                   "focus:outline-none",
                 )}
               >
@@ -162,25 +166,25 @@ export default function AdminSidebar() {
                     className={cn(
                       "mr-3 h-[18px] w-[18px] transition-colors",
                       parentHasActiveChild
-                        ? "text-white"
-                        : "text-gray-400 group-hover:text-white"
+                        ? "text-brand-blue dark:text-white"
+                        : "text-brand-gray dark:text-gray-400 group-hover:text-brand-blue dark:group-hover:text-white"
                     )}
                   />
                   <span>{item.title}</span>
                 </div>
                 <div className="flex items-center">
                   {parentHasActiveChild && (
-                    <div className="w-2 h-2 bg-white rounded-full mr-2" />
+                    <div className="w-2 h-2 bg-brand-blue dark:bg-white rounded-full mr-2" />
                   )}
                   {isExpanded ? (
                     <ChevronDown className={cn(
                       "h-4 w-4 transition-transform duration-200",
-                      parentHasActiveChild ? "text-white" : "text-gray-400"
+                      parentHasActiveChild ? "text-brand-blue dark:text-white" : "text-brand-gray dark:text-gray-400"
                     )} />
                   ) : (
                     <ChevronRight className={cn(
                       "h-4 w-4 transition-transform duration-200",
-                      parentHasActiveChild ? "text-white" : "text-gray-400"
+                      parentHasActiveChild ? "text-brand-blue dark:text-white" : "text-brand-gray dark:text-gray-400"
                     )} />
                   )}
                 </div>
@@ -199,8 +203,8 @@ export default function AdminSidebar() {
                         className={cn(
                           "flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 group relative",
                           subItemIsActive
-                            ? "bg-white text-gray-800 shadow-sm font-medium"
-                            : "text-gray-300 hover:bg-white/10 hover:text-white",
+                            ? "bg-brand-blue text-white shadow-md font-medium"
+                            : "text-brand-gray dark:text-gray-300 hover:bg-brand-blue/10 hover:text-brand-blue dark:hover:bg-white/10 dark:hover:text-white",
                         )}
                       >
                         {subItemIsActive && (
@@ -218,10 +222,10 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Footer / Logout */}
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-brand-border dark:border-white/10 p-3">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center px-4 py-3 text-sm font-bold text-white rounded-lg hover:bg-brand-red transition-all group"
+          className="flex w-full items-center px-4 py-3 text-sm font-bold text-brand-black dark:text-white rounded-lg hover:bg-brand-red hover:text-white transition-all group"
         >
           <LogOut className="mr-3 h-[18px] w-[18px] group-hover:-translate-x-0.5 transition-transform" />
           Log out

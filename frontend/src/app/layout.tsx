@@ -3,6 +3,8 @@ import "./globals.css";
 import { Outfit} from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/UI/Toaster";
+import BackToTop from "@/components/UI/BackToTop";
+import { ThemeProvider } from "@/components/theme-provider";
 
 
 
@@ -61,12 +63,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full", "font-sans")}>
+    <html lang="en" className={cn("h-full", "font-sans")} suppressHydrationWarning>
       <body
         className={`${outfit.variable} font-outfit antialiased h-full`}
       >
-        {children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <BackToTop />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

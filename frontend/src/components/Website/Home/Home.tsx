@@ -11,7 +11,7 @@ interface HomeProps {
 
 export default function Home({ news }: HomeProps) {
   return (
-    <div className="w-full min-h-screen max-w-420 mx-auto px-6">
+    <div className="w-full min-h-screen">
       {/* 1. Hero — headline, CTA, live market card & tickers */}
       <HeroSection />
 
@@ -25,7 +25,7 @@ export default function Home({ news }: HomeProps) {
       <LatestNewsSection news={news} />
 
       {/* 5. CTA Banner — drive engagement */}
-      <CTASection />
+      {/* <CTASection /> */}
     </div>
   );
 }

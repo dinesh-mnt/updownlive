@@ -1,20 +1,5 @@
-import Header from "@/components/Website/Header/Header";
-import MarketTicker from "@/components/MarketTicker";
-import Footer from "@/components/Website/Footer/Footer";
-import ArticleDetailPage from "@/components/Website/Shared/ArticleDetailPage";
+import BrokerDetailPage from "@/components/Website/Brokers/BrokerDetailPage";
 
 export default function BrokersArticlePage({ params }: { params: { id: string } }) {
-  return (
-    <>
-      <Header />
-      <MarketTicker />
-      <ArticleDetailPage
-        sectionTitle="Brokers"
-        backHref="/brokers"
-        accentColor="text-brand-blue"
-        storageKey={`brokers_${params.id}`}
-      />
-      <Footer />
-    </>
-  );
+  return <BrokerDetailPage params={params} />;
 }

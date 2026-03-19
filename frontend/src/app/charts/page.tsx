@@ -10,11 +10,11 @@ export async function generateMetadata() {
 
 export default function ChartsPage() {
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
       <Header />
       <MarketTicker />
       <Charts />
       <Footer />
-    </>
+    </div>
   );
 }

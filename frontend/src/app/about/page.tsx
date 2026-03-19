@@ -1,15 +1,5 @@
-import AboutPage from '@/components/Website/About/About';
-import Navbar from "@/components/Website/Header/Header";
-import MarketTicker from "@/components/MarketTicker";
-import Footer from "@/components/Website/Footer/Footer";
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return(
-    <>
-    <Navbar />
-    <MarketTicker />
-    <AboutPage />
-    <Footer />
-    </>
-  )
+  redirect('/about-us');
 }

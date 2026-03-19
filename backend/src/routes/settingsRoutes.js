@@ -75,6 +75,9 @@ function addApiKeyRoutes(router, routePath, dbKey) {
 // Forex — ExchangeRate-API
 addApiKeyRoutes(router, 'forex-api-key', 'forexApiKey');
 
+// Forex News — MarketAux API
+addApiKeyRoutes(router, 'forex-news-api-key', 'forexNewsApiKey');
+
 // Crypto — CoinGecko
 addApiKeyRoutes(router, 'crypto-api-key', 'cryptoApiKey');
 

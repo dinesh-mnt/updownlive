@@ -5,7 +5,6 @@ import { Loader2, AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
 interface TradingViewChartProps {
   symbol?: string;
   interval?: string;
-  theme?: 'light' | 'dark';
   height?: number;
   showToolbar?: boolean;
   showLegend?: boolean;
@@ -15,7 +14,6 @@ interface TradingViewChartProps {
 function TradingViewChart({
   symbol = "NASDAQ:AAPL",
   interval = "D",
-  theme = "light",
   height = 600,
   showToolbar = true,
   showLegend = true,
@@ -48,12 +46,12 @@ function TradingViewChart({
         symbol,
         interval,
         timezone: "Etc/UTC",
-        theme,
+        theme: "light",
         style: "1",
         locale: "en",
         enable_publishing: false,
-        backgroundColor: theme === 'light' ? "rgba(255, 255, 255, 1)" : "rgba(19, 23, 34, 1)",
-        gridColor: theme === 'light' ? "rgba(234, 234, 234, 1)" : "rgba(42, 46, 57, 1)",
+        backgroundColor: "rgba(255, 255, 255, 1)",
+        gridColor: "rgba(234, 234, 234, 1)",
         hide_top_toolbar: !showToolbar,
         hide_legend: !showLegend,
         save_image: false,
@@ -92,7 +90,7 @@ function TradingViewChart({
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [symbol, interval, theme, retryCount]);
+  }, [symbol, interval, retryCount]);
 
   const handleRetry = () => {
     setRetryCount(prev => prev + 1);
