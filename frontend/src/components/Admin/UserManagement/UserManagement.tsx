@@ -70,7 +70,7 @@ export default function UserManagement() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 font-outfit">
+        <div className="space-y-8 max-w-420 mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                      <Link href="/admin/dashboard" className="inline-flex items-center text-sm font-bold text-brand-blue hover:text-brand-red transition-colors mb-2">
@@ -86,7 +86,7 @@ export default function UserManagement() {
                 </div>
             </div>
 
-            <Card className="border-none shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-4xl overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">
+            <Card className="shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-4xl overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">
                 <CardHeader className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 px-8 py-6">
                     <CardTitle className="text-xl font-black text-brand-black dark:text-white">Platform Registry</CardTitle>
                 </CardHeader>
@@ -95,11 +95,11 @@ export default function UserManagement() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="px-8 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Subscriber</TableHead>
-                                    <TableHead className="px-6 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Email Identity</TableHead>
-                                    <TableHead className="px-6 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Authority</TableHead>
-                                    <TableHead className="px-6 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Verification Status</TableHead>
-                                    <TableHead className="px-8 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Actions</TableHead>
+                                    <TableHead className="px-8 py-4 font-bold text-white dark:text-gray-300 text-base">Subscriber</TableHead>
+                                    <TableHead className="px-6 py-4 font-bold text-white dark:text-gray-300 text-base">Email Identity</TableHead>
+                                    <TableHead className="px-6 py-4 font-bold text-white dark:text-gray-300 text-base">Authority</TableHead>
+                                    <TableHead className="px-6 py-4 font-bold text-white dark:text-gray-300 text-base">Verification Status</TableHead>
+                                    <TableHead className="px-8 py-4 font-bold text-white dark:text-gray-300 text-base">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -210,6 +210,55 @@ export default function UserManagement() {
                                     </div>
                                     <span className="font-mono text-[10px] text-brand-black dark:text-white bg-white dark:bg-black px-3 py-1 rounded-lg border border-slate-200 dark:border-white/10">{selectedUser.id || selectedUser._id}</span>
                                 </div>
+
+                                {/* Contact Information */}
+                                {selectedUser.phone && (
+                                    <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <span className="text-brand-gray dark:text-gray-400 font-bold uppercase tracking-widest text-xs block mb-2">Phone Number</span>
+                                        <span className="font-black text-brand-black dark:text-white">{selectedUser.phone}</span>
+                                    </div>
+                                )}
+
+                                {/* Address Information */}
+                                {(selectedUser.address || selectedUser.city || selectedUser.state || selectedUser.zipcode || selectedUser.country) && (
+                                    <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <span className="text-brand-gray dark:text-gray-400 font-bold uppercase tracking-widest text-xs block mb-3">Location Details</span>
+                                        <div className="space-y-2 text-sm">
+                                            {selectedUser.address && (
+                                                <div>
+                                                    <span className="text-brand-gray dark:text-gray-500 text-xs">Address:</span>
+                                                    <p className="font-bold text-brand-black dark:text-white">{selectedUser.address}</p>
+                                                </div>
+                                            )}
+                                            <div className="grid grid-cols-2 gap-4">
+                                                {selectedUser.city && (
+                                                    <div>
+                                                        <span className="text-brand-gray dark:text-gray-500 text-xs">City:</span>
+                                                        <p className="font-bold text-brand-black dark:text-white">{selectedUser.city}</p>
+                                                    </div>
+                                                )}
+                                                {selectedUser.state && (
+                                                    <div>
+                                                        <span className="text-brand-gray dark:text-gray-500 text-xs">State:</span>
+                                                        <p className="font-bold text-brand-black dark:text-white">{selectedUser.state}</p>
+                                                    </div>
+                                                )}
+                                                {selectedUser.zipcode && (
+                                                    <div>
+                                                        <span className="text-brand-gray dark:text-gray-500 text-xs">Zipcode:</span>
+                                                        <p className="font-bold text-brand-black dark:text-white">{selectedUser.zipcode}</p>
+                                                    </div>
+                                                )}
+                                                {selectedUser.country && (
+                                                    <div>
+                                                        <span className="text-brand-gray dark:text-gray-500 text-xs">Country:</span>
+                                                        <p className="font-bold text-brand-black dark:text-white">{selectedUser.country}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex gap-4">

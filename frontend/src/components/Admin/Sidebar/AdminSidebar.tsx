@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { 
-  LogOut, LayoutDashboard, Settings, Globe, Database, User, ChevronDown, ChevronRight, Mail
+  LogOut, LayoutDashboard, Settings, Globe, Database, User, ChevronDown, ChevronRight, Mail, Send, MessageSquare
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
@@ -40,6 +40,19 @@ export const navigation: NavigationItem[] = [
     title: 'User Management',
     icon: User,
     href: '/admin/dashboard/users',
+  },
+  {
+    title: 'Comments',
+    icon: MessageSquare,
+    href: '/admin/dashboard/comments',
+  },
+  {
+    title: 'Newsletter',
+    icon: Send,
+    subItems: [
+      { title: 'Subscribers', href: '/admin/dashboard/newsletter/subscribers' },
+      { title: 'Send Mail', href: '/admin/dashboard/newsletter/send-mail' }
+    ]
   },
   {
     title: 'Settings',

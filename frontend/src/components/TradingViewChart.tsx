@@ -89,7 +89,9 @@ function TradingViewChart({
       loadWidget();
     }, 100);
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [symbol, interval, retryCount]);
 
   const handleRetry = () => {

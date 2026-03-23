@@ -6,7 +6,7 @@ import LatestNewsSection from "./LatestNewsSection";
 import CTASection from "./CTASection";
 
 interface HomeProps {
-  news: any[];
+  news?: any[];
 }
 
 export default function Home({ news }: HomeProps) {
@@ -22,7 +22,7 @@ export default function Home({ news }: HomeProps) {
       <MarketOverviewSection />
 
       {/* 4. Latest News — featured + compact list */}
-      <LatestNewsSection news={news} />
+      <LatestNewsSection />
 
       {/* 5. CTA Banner — drive engagement */}
       {/* <CTASection /> */}

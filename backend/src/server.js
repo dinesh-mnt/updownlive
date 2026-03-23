@@ -10,6 +10,12 @@ import { createAuth, getMongoClient } from './config/auth.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import enquiryRoutes from './routes/enquiryRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import newsletterRoutes from './routes/newsletterRoutes.js';
+import forexRoutes from './routes/forexRoutes.js';
+import goldRoutes from './routes/goldRoutes.js';
+import cryptoRoutes from './routes/cryptoRoutes.js';
+import newsRoutes from './routes/newsRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
 import connectDB from './config/db.js';
 
 const app = express();
@@ -111,6 +117,12 @@ app.use(cookieParser());
 app.use('/api/settings', settingsRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/forex', forexRoutes);
+app.use('/api/gold', goldRoutes);
+app.use('/api/crypto', cryptoRoutes);
+app.use('/api/news', newsRoutes);
+app.use('/api/comments', commentRoutes);
 
 app.get('/', (_req, res) => {
   res.json({ 

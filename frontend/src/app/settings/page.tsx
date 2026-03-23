@@ -10,29 +10,68 @@ import {
   Loader2, 
   ArrowLeft,
   Mail,
-  ShieldAlert,
+  Phone,
+  MapPin,
   Sun,
   Moon,
-  Monitor,
-  CheckCircle2,
-  XCircle
+  Monitor
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/UI/Tabs";
 import { useTheme } from "next-themes";
+import axiosInstance from '@/lib/axios';
+
+interface UserProfile {
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipcode?: string;
+  country?: string;
+  role?: string;
+}
 
 export default function SettingsPage() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Fetch user profile
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      setLoadingProfile(true);
+      const response = await axiosInstance.get(`/users/${userId}`);
+      setUserProfile(response.data);
+    } catch (error: any) {
+      console.error('Error fetching user profile:', error);
+      // Set default values from session if API fails
+      if (session?.user) {
+        setUserProfile({
+          name: session.user.name || '',
+          email: session.user.email || '',
+          role: (session.user as any)?.role || 'user',
+        });
+      }
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchUserProfile(session.user.id);
+    }
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -40,7 +79,7 @@ export default function SettingsPage() {
     }
   }, [isPending, session, router]);
 
-  if (isPending || !mounted) {
+  if (isPending || !mounted || loadingProfile) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
@@ -55,28 +94,13 @@ export default function SettingsPage() {
 
   const user = session.user;
 
-  const handlePasswordReset = async () => {
-      setResetLoading(true);
-      try {
-        await authClient.requestPasswordReset({
-          email: user.email,
-          redirectTo: "/reset-password",
-        });
-        setResetSent(true);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setResetLoading(false);
-      }
-    };
-
   return (
     <div className="min-h-screen bg-white dark:bg-black font-outfit transition-colors duration-300 flex flex-col">
       <Navbar />
       <MarketTicker />
       
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto">
+      <main className="flex-1 max-w-420 w-full mx-auto px-6 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-12">
             <Link 
@@ -112,55 +136,120 @@ export default function SettingsPage() {
             {/* Profile Tab */}
             <TabsContent value="profile" className="space-y-8 animate-in fade-in duration-300">
               <div className="bg-brand-light dark:bg-white/5 backdrop-blur-2xl border border-brand-border dark:border-white/10 rounded-2xl p-8 shadow-sm">
-                <h2 className="text-2xl font-bold text-brand-black dark:text-white mb-6">User Information</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-brand-gray dark:text-gray-400 text-sm font-semibold mb-1">Full Name</p>
-                    <p className="text-lg font-bold text-brand-black dark:text-white bg-white dark:bg-black/50 p-4 rounded-xl border border-brand-border dark:border-white/10">{user.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-brand-gray dark:text-gray-400 text-sm font-semibold mb-1">Email Address</p>
-                    <p className="text-lg font-bold text-brand-black dark:text-white bg-white dark:bg-black/50 p-4 rounded-xl border border-brand-border dark:border-white/10 flex flex-wrap items-center gap-2 justify-between">
-                      <span className="truncate">{user.email}</span>
-                      {user.emailVerified ? (
-                        <span className="flex shrink-0 items-center text-xs font-bold text-green-600 bg-green-50 dark:bg-green-500/10 px-2 py-1 rounded-full"><CheckCircle2 size={12} className="mr-1"/> Verified</span>
-                      ) : (
-                        <span className="flex shrink-0 items-center text-xs font-bold text-brand-red bg-brand-red/10 px-2 py-1 rounded-full"><XCircle size={12} className="mr-1"/> Unverified</span>
-                      )}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-brand-gray dark:text-gray-400 text-sm font-semibold mb-1">Role</p>
-                    <p className="text-lg font-bold text-brand-black dark:text-white bg-white dark:bg-black/50 p-4 rounded-xl border border-brand-border dark:border-white/10 capitalize">{(user as any).role || 'User'}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-brand-light dark:bg-white/5 backdrop-blur-2xl border border-brand-border dark:border-white/10 rounded-2xl p-8 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <ShieldAlert className="text-brand-blue" size={24} />
-                  <h2 className="text-2xl font-bold text-brand-black dark:text-white">Security Settings</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-brand-black dark:text-white">User Information</h2>
+                  <Link 
+                    href="/profile"
+                    className="text-sm font-bold text-brand-blue hover:text-brand-black dark:hover:text-white transition-colors"
+                  >
+                    Edit Profile →
+                  </Link>
                 </div>
                 
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
-                  <div className="mb-4 md:mb-0">
-                    <h4 className="text-brand-black dark:text-white font-bold text-lg">Change Password</h4>
-                    <p className="text-brand-gray dark:text-gray-400 text-sm mt-1">We will send a secure verification link to <strong>{user.email}</strong> to reset your password.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Name */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <User size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Full Name</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13">
+                      {userProfile?.name || 'Not provided'}
+                    </p>
                   </div>
-                  {resetSent ? (
-                     <div className="flex shrink-0 items-center text-green-600 font-bold bg-green-50 dark:bg-green-500/10 px-4 py-3 rounded-xl border border-green-200 dark:border-green-500/20">
-                       <CheckCircle2 className="mr-2" size={20} /> Reset link sent!
-                     </div>
-                  ) : (
-                    <button
-                      onClick={handlePasswordReset}
-                      disabled={resetLoading}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-brand-black dark:bg-white hover:bg-brand-gray dark:hover:bg-gray-200 text-white dark:text-black font-bold rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed shrink-0 shadow-lg"
-                    >
-                      {resetLoading ? <Loader2 className="animate-spin" size={18} /> : <Mail size={18} />}
-                      {resetLoading ? 'Sending...' : 'Verify by Mail'}
-                    </button>
-                  )}
+
+                  {/* Email */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <Mail size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Email Address</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13 truncate">
+                      {user.email}
+                    </p>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <Phone size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Phone Number</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13">
+                      {userProfile?.phone || 'Not provided'}
+                    </p>
+                  </div>
+
+                  {/* Address */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <MapPin size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Address</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13">
+                      {userProfile?.address || 'Not provided'}
+                    </p>
+                  </div>
+
+                  {/* City */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <MapPin size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">City</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13">
+                      {userProfile?.city || 'Not provided'}
+                    </p>
+                  </div>
+
+                  {/* State */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <MapPin size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">State/Province</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13">
+                      {userProfile?.state || 'Not provided'}
+                    </p>
+                  </div>
+
+                  {/* Zipcode */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <MapPin size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Zip/Postal Code</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13">
+                      {userProfile?.zipcode || 'Not provided'}
+                    </p>
+                  </div>
+
+                  {/* Country */}
+                  <div className="p-5 bg-white dark:bg-black/50 rounded-xl border border-brand-border dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                        <MapPin size={18} />
+                      </div>
+                      <p className="text-brand-gray dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Country</p>
+                    </div>
+                    <p className="text-lg font-bold text-brand-black dark:text-white ml-13">
+                      {userProfile?.country || 'Not provided'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </TabsContent>

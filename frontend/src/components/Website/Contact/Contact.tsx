@@ -56,10 +56,13 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!formData.agreedToTerms) {
+      setStatus('error');
       setErrorMessage('You must agree to the Terms of Service to submit.');
       return;
     }
+    
     setStatus('loading');
     setErrorMessage('');
     
@@ -326,22 +329,25 @@ export default function ContactPage() {
               {/* Terms */}
               <div className="flex items-start gap-3">
                 <input
-                  id="terms" type="checkbox" checked={formData.agreedToTerms}
-                  onChange={(e) => setFormData({ ...formData, agreedToTerms: e.target.checked })}
+                  id="terms" 
+                  type="checkbox" 
+                  checked={formData.agreedToTerms}
+                  onChange={(e) => {
+                    setFormData({ ...formData, agreedToTerms: e.target.checked });
+                    if (e.target.checked && status === 'error' && errorMessage.includes('Terms of Service')) {
+                      setStatus('idle');
+                      setErrorMessage('');
+                    }
+                  }}
                   className="mt-1 w-4 h-4 rounded border-gray-300 accent-brand-blue cursor-pointer"
+                  required
                 />
                 <label htmlFor="terms" className="text-sm text-brand-gray dark:text-gray-400 cursor-pointer leading-relaxed">
                   By submitting, I acknowledge and agree to UpDownLive{' '}
-                  <a href="#" className="text-brand-blue hover:underline font-semibold">Terms of Service</a>
+                  <a href="/terms" className="text-brand-blue hover:underline font-semibold">Terms of Service</a>
+                  {' '}<span className="text-brand-red">*</span>
                 </label>
               </div>
-
-              {/* reCAPTCHA note */}
-              <p className="text-xs italic text-brand-gray/70">
-                This site is protected by reCAPTCHA and the Google{' '}
-                <a href="#" className="text-brand-blue hover:underline">Privacy Policy</a> and{' '}
-                <a href="#" className="text-brand-blue hover:underline">Terms of Service</a> apply.
-              </p>
 
               {/* Submit */}
               <div>

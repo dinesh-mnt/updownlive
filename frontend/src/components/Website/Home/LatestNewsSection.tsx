@@ -1,17 +1,19 @@
-
+"use client";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Newspaper, Clock } from "lucide-react";
+import { setArticle as storeArticle } from "@/lib/articleStore";
 
 interface Article {
+  id: string;
   title: string;
-  url: string;
-  urlToImage?: string;
-  source: { name: string };
+  subtitle: string;
+  author: string;
   publishedAt: string;
-}
-
-interface LatestNewsSectionProps {
-  news: Article[];
+  imageUrl: string;
+  url: string;
+  source: string;
 }
 
 function timeAgo(dateStr: string): string {
@@ -23,8 +25,40 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-export default function LatestNewsSection({ news }: LatestNewsSectionProps) {
+export default function LatestNewsSection() {
+  const [news, setNews] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
 
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch('/api/business-news?category=business&limit=6');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.articles) {
+            setNews(data.articles);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch news:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+  }, []);
+
+  const router = useRouter();
+
+  const handleReadClick = (article: Article) => {
+    storeArticle(`news_${article.id}`, article);
+    router.push(`/news/${article.id}`);
+  };
+
+  const handleImageError = (index: number) => {
+    setImageErrors(prev => new Set(prev).add(index));
+  };
 
   return (
     <section className="py-24 bg-white dark:bg-black border-t border-brand-border dark:border-white/5 relative overflow-hidden">
@@ -54,20 +88,34 @@ export default function LatestNewsSection({ news }: LatestNewsSectionProps) {
           </Link>
         </div>
 
-        {news.length > 0 ? (
+        {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {news.slice(0, 6).map((article, index) => (
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl border border-brand-border dark:border-white/10 overflow-hidden">
+                <div className="h-52 bg-brand-light dark:bg-zinc-800 animate-pulse" />
+                <div className="p-6 space-y-3">
+                  <div className="h-4 bg-brand-light dark:bg-zinc-800 rounded animate-pulse w-3/4" />
+                  <div className="h-4 bg-brand-light dark:bg-zinc-800 rounded animate-pulse w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : news.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+            {news.map((article, index) => (
               <div
-                key={index}
+                key={article.id}
                 className="group flex flex-col bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-sm border border-brand-border dark:border-white/10 hover:shadow-xl hover:shadow-brand-black/8 hover:-translate-y-1 transition-all duration-300"
               >
                 {/* Image */}
                 <div className="h-52 w-full overflow-hidden bg-brand-light dark:bg-zinc-800 relative shrink-0">
-                  {article.urlToImage ? (
+                  {article.imageUrl && !imageErrors.has(index) ? (
                     <img
-                      src={article.urlToImage}
-                      alt={article.title}
+                      src={article.imageUrl}
+                      alt={article.title || 'News article image'}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={() => handleImageError(index)}
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-brand-blue/10 to-brand-red/10 dark:from-blue-900/20 dark:to-red-900/20">
@@ -79,7 +127,7 @@ export default function LatestNewsSection({ news }: LatestNewsSectionProps) {
                   {/* Source badge */}
                   <div className="absolute top-3 left-3">
                     <span className="bg-white/90 dark:bg-black/90 backdrop-blur-sm text-brand-blue px-3 py-1 rounded-full text-xs font-bold shadow-sm">
-                      {article.source.name}
+                      {article.source}
                     </span>
                   </div>
                   {index === 0 && (
@@ -98,23 +146,23 @@ export default function LatestNewsSection({ news }: LatestNewsSectionProps) {
                     {timeAgo(article.publishedAt)}
                   </div>
                   <h3 className="text-base font-extrabold text-brand-black dark:text-white leading-snug mb-4 flex-1 group-hover:text-brand-blue transition-colors duration-200">
-                    <Link
-                      href={`/news/${encodeURIComponent(article.url)}`}
-                      className="line-clamp-3"
+                    <button
+                      onClick={() => handleReadClick(article)}
+                      className="line-clamp-3 text-left hover:text-brand-blue transition-colors"
                     >
                       {article.title}
-                    </Link>
+                    </button>
                   </h3>
                   <div className="pt-4 border-t border-brand-border dark:border-white/10 flex items-center justify-between">
                     <span className="text-xs font-semibold text-brand-gray dark:text-gray-400 uppercase tracking-wider">
                       {new Date(article.publishedAt).toLocaleDateString()}
                     </span>
-                    <Link
-                      href={`/news/${encodeURIComponent(article.url)}`}
+                    <button
+                      onClick={() => handleReadClick(article)}
                       className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-red hover:text-brand-blue transition-colors"
                     >
                       Read <ArrowRight size={14} />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -123,7 +171,7 @@ export default function LatestNewsSection({ news }: LatestNewsSectionProps) {
         ) : (
           <div className="py-20 text-center">
             <div className="inline-flex flex-col items-center gap-4 p-10 rounded-2xl bg-brand-light dark:bg-zinc-900 border border-brand-border dark:border-white/10">
-              <Newspaper size={40} className="text-brand-border" />
+              <Newspaper size={40} className="text-brand-border dark:text-white/20" />
               <p className="text-lg font-semibold text-brand-gray dark:text-white">
                 No news available at the moment.
               </p>

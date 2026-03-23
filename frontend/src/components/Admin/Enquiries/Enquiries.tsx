@@ -103,7 +103,7 @@ export default function Enquiries() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 ">
+    <div className="space-y-8 max-w-420 mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <Link href="/admin/dashboard" className="inline-flex items-center text-sm font-bold text-brand-blue hover:text-brand-red transition-colors mb-2">
@@ -129,7 +129,7 @@ export default function Enquiries() {
         />
       </div>
 
-      <Card className="border-none shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-4xl overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">
+      <Card className="shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-4xl overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">
         <CardHeader className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 px-8 py-6">
           <CardTitle className="text-xl font-black text-brand-black dark:text-white">Contact Submissions</CardTitle>
         </CardHeader>
@@ -138,12 +138,12 @@ export default function Enquiries() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="px-8 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Date</TableHead>
-                  <TableHead className="px-6 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Department</TableHead>
-                  <TableHead className="px-6 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Contact Info</TableHead>
-                  <TableHead className="px-6 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Company</TableHead>
-                  <TableHead className="px-6 py-4 font-bold text-slate-500 dark:text-gray-300 text-base">Message</TableHead>
-                  <TableHead className="px-8 py-4 font-bold text-slate-500 dark:text-gray-300 text-base text-right">Actions</TableHead>
+                  <TableHead className="px-8 py-4 font-bold text-white dark:text-gray-300 text-base">Date</TableHead>
+                  <TableHead className="px-6 py-4 font-bold text-white dark:text-gray-300 text-base">Department</TableHead>
+                  <TableHead className="px-6 py-4 font-bold text-white dark:text-gray-300 text-base">Contact Info</TableHead>
+                  <TableHead className="px-6 py-4 font-bold text-white dark:text-gray-300 text-base">Company</TableHead>
+                  <TableHead className="px-6 py-4 font-bold text-white dark:text-gray-300 text-base">Message</TableHead>
+                  <TableHead className="px-8 py-4 font-bold text-white dark:text-gray-300 text-base text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

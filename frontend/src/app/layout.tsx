@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/UI/Toaster";
 import BackToTop from "@/components/UI/BackToTop";
 import { ThemeProvider } from "@/components/theme-provider";
+import Script from "next/script";
 
 
 
@@ -64,6 +65,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("h-full", "font-sans")} suppressHydrationWarning>
+      <head>
+        <Script
+          id="suppress-tradingview-errors"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                if (typeof window !== 'undefined') {
+                  const originalError = console.error;
+                  console.error = function(...args) {
+                    const msg = args[0]?.toString() || '';
+                    const suppressPatterns = ['contentWindow', 'Cannot listen to the event from the provided iframe', 'tradingview'];
+                    if (suppressPatterns.some(p => msg.toLowerCase().includes(p.toLowerCase()))) {
+                      return;
+                    }
+                    originalError.apply(console, args);
+                  };
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${outfit.variable} font-outfit antialiased h-full`}
       >

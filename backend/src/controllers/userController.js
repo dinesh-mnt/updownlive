@@ -117,3 +117,60 @@ export const updateUserStatus = async (req, res) => {
         res.status(500).json({ message: 'Internal server error while updating user status' });
     }
 };
+
+export const updateUserProfile = async (req, res) => {
+    const { userId } = req.params;
+    const { name, phone, address, city, state, zipcode, country } = req.body;
+
+    try {
+        const client = await getMongoClient();
+        const db = client.db();
+        
+        // Build update object with only provided fields
+        const updateData = {};
+        if (name !== undefined) updateData.name = name;
+        if (phone !== undefined) updateData.phone = phone;
+        if (address !== undefined) updateData.address = address;
+        if (city !== undefined) updateData.city = city;
+        if (state !== undefined) updateData.state = state;
+        if (zipcode !== undefined) updateData.zipcode = zipcode;
+        if (country !== undefined) updateData.country = country;
+        
+        // Add updated timestamp
+        updateData.updatedAt = new Date();
+        
+        let result;
+        
+        // First try with the 'id' field (Better Auth standard)
+        result = await db.collection('user').updateOne(
+            { id: userId },
+            { $set: updateData }
+        );
+        
+        // If no match found, try with MongoDB's _id field
+        if (result.matchedCount === 0) {
+            try {
+                const { ObjectId } = await import('mongodb');
+                result = await db.collection('user').updateOne(
+                    { _id: new ObjectId(userId) },
+                    { $set: updateData }
+                );
+            } catch (objectIdError) {
+                console.log('Invalid ObjectId format, trying as string _id');
+                result = await db.collection('user').updateOne(
+                    { _id: userId },
+                    { $set: updateData }
+                );
+            }
+        }
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ message: 'Profile updated successfully', data: updateData });
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).json({ message: 'Internal server error while updating profile' });
+    }
+};

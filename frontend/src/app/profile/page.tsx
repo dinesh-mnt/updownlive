@@ -4,10 +4,9 @@ import Navbar from "@/components/Website/Header/Header";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Website/Footer/Footer";
 import { authClient } from "@/lib/auth-client";
-import { User, Mail, Phone, MapPin, Calendar, LogOut, Loader2, Save, Edit2 } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, LogOut, Loader2, Save, Edit2, CheckCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axiosInstance from '@/lib/axios';
-import { useToast } from "@/hooks/use-toast";
 
 interface UserProfile {
   name: string;
@@ -15,6 +14,8 @@ interface UserProfile {
   phone?: string;
   address?: string;
   city?: string;
+  state?: string;
+  zipcode?: string;
   country?: string;
   role?: string;
   createdAt?: string;
@@ -26,8 +27,9 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState({ type: 'success' as 'success' | 'error', message: '' });
   const router = useRouter();
-  const { toast } = useToast();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -35,6 +37,8 @@ export default function ProfilePage() {
     phone: '',
     address: '',
     city: '',
+    state: '',
+    zipcode: '',
     country: '',
   });
 
@@ -50,6 +54,8 @@ export default function ProfilePage() {
         phone: profile.phone || '',
         address: profile.address || '',
         city: profile.city || '',
+        state: profile.state || '',
+        zipcode: profile.zipcode || '',
         country: profile.country || '',
       });
     } catch (error: any) {
@@ -66,6 +72,8 @@ export default function ProfilePage() {
           phone: '',
           address: '',
           city: '',
+          state: '',
+          zipcode: '',
           country: '',
         });
       }
@@ -86,16 +94,15 @@ export default function ProfilePage() {
       await fetchUserProfile(session.user.id);
       
       setIsEditing(false);
-      toast({
-        variant: 'success' as any,
-        description: 'Profile updated successfully!',
-      });
+      setModalMessage({ type: 'success', message: 'Profile updated successfully!' });
+      setShowModal(true);
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      toast({
-        variant: 'destructive',
-        description: error.response?.data?.message || 'Failed to update profile',
+      setModalMessage({ 
+        type: 'error', 
+        message: error.response?.data?.message || 'Failed to update profile. Please try again.' 
       });
+      setShowModal(true);
     } finally {
       setIsSaving(false);
     }
@@ -109,6 +116,8 @@ export default function ProfilePage() {
         phone: userProfile.phone || '',
         address: userProfile.address || '',
         city: userProfile.city || '',
+        state: userProfile.state || '',
+        zipcode: userProfile.zipcode || '',
         country: userProfile.country || '',
       });
     }
@@ -150,8 +159,8 @@ export default function ProfilePage() {
       <Navbar />
       <MarketTicker />
       
-      <main className="max-w-7xl mx-auto px-6 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto">
+      <main className="max-w-420 mx-auto px-6 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto">
           <div className="mb-12">
             <h1 className="text-4xl md:text-5xl font-extrabold text-brand-black dark:text-white tracking-tight mb-4">
               {isAdmin ? 'Admin Profile' : 'My Profile'}
@@ -163,7 +172,7 @@ export default function ProfilePage() {
           
           <div className="bg-brand-light dark:bg-white/3 backdrop-blur-2xl border border-brand-border dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
             {/* Banner Gradient */}
-            <div className="h-40 bg-gradient-to-r from-brand-blue/30 via-brand-blue/10 to-brand-red/20 relative">
+            <div className="h-40 bg-linear-to-r from-brand-blue/30 via-brand-blue/10 to-brand-red/20 relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(6,66,240,0.1),transparent)]"></div>
             </div>
 
@@ -345,6 +354,46 @@ export default function ProfilePage() {
                           )}
                         </div>
 
+                        {/* State */}
+                        <div className="p-5 bg-white dark:bg-white/5 border border-brand-border dark:border-white/5 rounded-2xl">
+                          <p className="text-[10px] font-bold text-brand-gray dark:text-gray-500 uppercase tracking-widest leading-none mb-2">
+                            State/Province
+                          </p>
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              value={formData.state}
+                              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                              className="w-full bg-transparent text-brand-black dark:text-white font-bold border-b border-brand-blue/30 focus:border-brand-blue outline-none pb-1"
+                              placeholder="Enter state"
+                            />
+                          ) : (
+                            <p className="text-brand-black dark:text-white font-bold">
+                              {formData.state || 'Not provided'}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Zipcode */}
+                        <div className="p-5 bg-white dark:bg-white/5 border border-brand-border dark:border-white/5 rounded-2xl">
+                          <p className="text-[10px] font-bold text-brand-gray dark:text-gray-500 uppercase tracking-widest leading-none mb-2">
+                            Zip/Postal Code
+                          </p>
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              value={formData.zipcode}
+                              onChange={(e) => setFormData({ ...formData, zipcode: e.target.value })}
+                              className="w-full bg-transparent text-brand-black dark:text-white font-bold border-b border-brand-blue/30 focus:border-brand-blue outline-none pb-1"
+                              placeholder="Enter zipcode"
+                            />
+                          ) : (
+                            <p className="text-brand-black dark:text-white font-bold">
+                              {formData.zipcode || 'Not provided'}
+                            </p>
+                          )}
+                        </div>
+
                         {/* Country */}
                         <div className="p-5 bg-white dark:bg-white/5 border border-brand-border dark:border-white/5 rounded-2xl">
                           <p className="text-[10px] font-bold text-brand-gray dark:text-gray-500 uppercase tracking-widest leading-none mb-2">
@@ -411,6 +460,42 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
+
+      {/* Success/Error Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 dark:bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-zinc-900 rounded-4xl w-full max-w-md shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8">
+              <div className="flex flex-col items-center text-center">
+                {modalMessage.type === 'success' ? (
+                  <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center mb-6">
+                    <CheckCircle size={40} className="text-green-600 dark:text-green-400" />
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center mb-6">
+                    <XCircle size={40} className="text-red-600 dark:text-red-400" />
+                  </div>
+                )}
+                
+                <h3 className="text-2xl font-black text-brand-black dark:text-white mb-3">
+                  {modalMessage.type === 'success' ? 'Success!' : 'Error'}
+                </h3>
+                
+                <p className="text-brand-gray dark:text-gray-400 mb-8 leading-relaxed">
+                  {modalMessage.message}
+                </p>
+                
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="w-full px-8 py-4 bg-brand-blue hover:bg-brand-blue/90 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

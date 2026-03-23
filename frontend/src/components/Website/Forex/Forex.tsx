@@ -5,6 +5,7 @@ import {
   Search, ChevronDown, ChevronUp, Clock, ExternalLink,
   Newspaper, AlertCircle, LayoutGrid, List
 } from "lucide-react";
+import { setArticle } from "@/lib/articleStore";
 
 interface ForexArticle {
   id: string;
@@ -46,7 +47,7 @@ function ArticleRow({ article }: { article: ForexArticle }) {
 
   const handleRoute = (e: React.MouseEvent) => {
     e.preventDefault();
-    sessionStorage.setItem(`forex_${article.id}`, JSON.stringify(article));
+    setArticle(`forex_${article.id}`, article);
     router.push(`/forex/${article.id}`);
   };
 
@@ -149,7 +150,7 @@ function ArticleGridCard({ article }: { article: ForexArticle }) {
 
   const handleRoute = (e: React.MouseEvent) => {
     e.preventDefault();
-    sessionStorage.setItem(`forex_${article.id}`, JSON.stringify(article));
+    setArticle(`forex_${article.id}`, article);
     router.push(`/forex/${article.id}`);
   };
 

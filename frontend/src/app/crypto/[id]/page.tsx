@@ -1,5 +1,16 @@
-import CryptoDetailPage from "@/components/Website/Crypto/CryptoDetailPage";
+import Header from "@/components/Website/Header/Header";
+import MarketTicker from "@/components/MarketTicker";
+import Footer from "@/components/Website/Footer/Footer";
+import CryptoDetailClient from "@/components/Website/Crypto/CryptoDetailClient";
 
-export default function CryptoArticlePage({ params }: { params: { id: string } }) {
-  return <CryptoDetailPage params={params} />;
+export default async function CryptoArticlePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return (
+    <div className="min-h-screen bg-white dark:bg-black">
+      <Header />
+      <MarketTicker />
+      <CryptoDetailClient id={id} />
+      <Footer />
+    </div>
+  );
 }
