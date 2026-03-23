@@ -89,3 +89,29 @@ html:not(.dark) body {
   background: #ffffff;
   color: #111111;
 }
+
+/* ── react-phone-number-input overrides ── */
+.phone-input-wrapper {
+  @apply w-full;
+}
+.phone-input-wrapper .PhoneInput {
+  @apply flex items-center gap-2 w-full px-4 py-3.5 bg-brand-light dark:bg-zinc-800 border border-transparent dark:border-white/5 rounded-lg transition-all;
+}
+.phone-input-wrapper .PhoneInput:focus-within {
+  @apply bg-white dark:bg-zinc-900 border-brand-blue ring-2 ring-brand-blue/20;
+}
+.phone-input-wrapper .PhoneInputCountry {
+  @apply flex items-center gap-1 shrink-0;
+}
+.phone-input-wrapper .PhoneInputCountrySelect {
+  @apply bg-white dark:bg-zinc-800 text-brand-black dark:text-white font-medium text-sm outline-none cursor-pointer rounded;
+}
+.phone-input-wrapper .PhoneInputCountrySelect option {
+  @apply bg-white dark:bg-zinc-800 text-brand-black dark:text-white;
+}
+.phone-input-wrapper .PhoneInputInput {
+  @apply flex-1 bg-transparent text-brand-black dark:text-white font-medium text-sm outline-none placeholder:text-brand-gray/50 dark:placeholder:text-gray-500;
+}
+.phone-input-error .PhoneInput {
+  @apply border-red-400 ring-2 ring-red-400/20;
+}

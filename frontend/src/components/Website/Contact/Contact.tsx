@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '@/lib/axios';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import {
   Send, Check, AlertCircle,
   Building2, MapPin, Phone, Mail, Clock, Globe
@@ -40,11 +42,12 @@ export default function ContactPage() {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
+    phone: '' as string | undefined,
     companyName: '',
     message: '',
     agreedToTerms: false,
   });
+  const [phoneError, setPhoneError] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -62,6 +65,13 @@ export default function ContactPage() {
       setErrorMessage('You must agree to the Terms of Service to submit.');
       return;
     }
+
+    // Validate phone if provided
+    if (formData.phone && !isValidPhoneNumber(formData.phone)) {
+      setPhoneError('Please enter a valid phone number.');
+      return;
+    }
+    setPhoneError('');
     
     setStatus('loading');
     setErrorMessage('');
@@ -81,6 +91,7 @@ export default function ContactPage() {
         message: '',
         agreedToTerms: false,
       });
+      setPhoneError('');
     } catch (err: any) {
       console.error('Enquiry submission error:', err);
       console.error('Error response:', err.response);
@@ -144,7 +155,7 @@ export default function ContactPage() {
   ].filter(card => card.value); // only show fields that have content
 
   return (
-    <div className="bg-[#f9f9f9] dark:bg-black min-h-screen py-20 font-sans">
+    <div className="bg-brand-light dark:bg-black min-h-screen py-20 font-sans">
       <div className="max-w-420 mx-auto px-6">
 
         {/* Page Header */}
@@ -190,14 +201,14 @@ export default function ContactPage() {
                       const Icon = card.icon;
                       return (
                         <div key={i} className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/15 transition-colors">
-                          <div className="w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
                             <Icon size={18} className="text-white" />
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-1">
                               {card.label}
                             </p>
-                            <p className="text-white font-medium text-sm leading-snug whitespace-pre-line break-words">
+                            <p className="text-white font-medium text-sm leading-snug whitespace-pre-line wrap-break-word">
                               {card.value}
                             </p>
                           </div>
@@ -228,7 +239,7 @@ export default function ContactPage() {
                     href={link.href}
                     className="flex items-center gap-2 text-sm font-semibold text-brand-gray dark:text-gray-400 hover:text-brand-blue transition-colors py-1"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0" />
                     {link.label}
                   </a>
                 ))}
@@ -305,9 +316,21 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="phone" className="text-sm font-semibold text-brand-black dark:text-white">Phone</label>
-                  <input type="tel" id="phone" value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className={inputClass} placeholder="+1 (123) 456-7890" />
+                  <PhoneInput
+                    international
+                    defaultCountry="IN"
+                    value={formData.phone}
+                    onChange={(val) => {
+                      setFormData({ ...formData, phone: val });
+                      if (phoneError) setPhoneError('');
+                    }}
+                    className={`phone-input-wrapper ${phoneError ? 'phone-input-error' : ''}`}
+                  />
+                  {phoneError && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 mt-0.5">
+                      <AlertCircle size={12} /> {phoneError}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="companyName" className="text-sm font-semibold text-brand-black dark:text-white">Company Name</label>

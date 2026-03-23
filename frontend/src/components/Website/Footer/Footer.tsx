@@ -220,19 +220,36 @@ export default function Footer() {
         </div>
 
         {/* Horizontal Divider */}
-        <div className="w-full h-px bg-gray-200 dark:bg-gray-900 my-10 hidden md:block"></div>
+        <div className="relative my-10 hidden md:flex items-center gap-4">
+          <div className="flex-1 h-px bg-linear-to-r from-transparent via-red-500/60 to-amber-500/60" />
+          <span className="shrink-0 text-xs font-bold uppercase tracking-widest text-red-500 dark:text-red-400 px-3 py-1 rounded-full border border-red-500/30 bg-red-50 dark:bg-red-500/10">
+            ⚠ Risk Warnings
+          </span>
+          <div className="flex-1 h-px bg-linear-to-l from-transparent via-red-500/60 to-amber-500/60" />
+        </div>
 
         {/* Warnings Section */}
-        <div className="flex flex-col gap-5 text-xs text-gray-500 leading-relaxed text-justify mt-8 md:mt-0 max-w-none">
-          <p>
-            <strong className="text-gray-300 font-semibold">High risk warning:</strong> Foreign exchange trading carries a high level of risk that may not be suitable for all investors. Leverage creates additional risk and loss exposure. Before you decide to trade foreign exchange, carefully consider your investment objectives, experience level, and risk tolerance. You could lose some or all of your initial investment; do not invest money that you cannot afford to lose. Educate yourself on the risks associated with foreign exchange trading and seek advice from an independent financial or tax advisor if you have any questions.
-          </p>
-          <p>
-            <strong className="text-gray-300 font-semibold">Advisory warning:</strong> UpDownLive is not an investment advisor, UpDownLive provides references and links to selected news, blogs and other sources of economic and market information for informational purposes and as an educational service to its clients and prospects and does not endorse the opinions or recommendations of the blogs or other sources of information. Clients and prospects are advised to carefully consider the opinions and analysis offered in the blogs or other information sources in the context of the client or prospect's individual analysis and decision making. None of the blogs or other sources of information is to be considered as constituting a track record. Past performance is no guarantee of future results and UpDownLive specifically hereby acknowledges clients and prospects to carefully review all claims and representations made by advisors, bloggers, money managers and system vendors before investing any funds or opening an account with any Forex dealer. Any news, opinions, research, data, or other information contained within this website is provided on an "as-is" basis as a general market commentary and does not constitute investment or trading advice, and we do not purport to present the entire relevant or available public information with respect to a specific market or security. UpDownLive expressly disclaims any liability for any lost principal or profits which may arise directly or indirectly from the use of or reliance on such information, or with respect to any of the content presented within its website, nor its editorial choices.
-          </p>
-          <p>
-            <strong className="text-gray-300 font-semibold">Disclaimer:</strong> UpDownLive may be compensated by the advertisers that appear on the website, based on your interaction with the advertisements or advertisers.
-          </p>
+        <div className="flex flex-col gap-4 mt-8 md:mt-0">
+          <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/5 px-5 py-4">
+            <p className="text-xs text-red-700 dark:text-red-300/80 leading-relaxed text-justify">
+              <strong className="text-red-600 dark:text-red-400 font-bold">High risk warning: </strong>
+              Foreign exchange trading carries a high level of risk that may not be suitable for all investors. Leverage creates additional risk and loss exposure. Before you decide to trade foreign exchange, carefully consider your investment objectives, experience level, and risk tolerance. You could lose some or all of your initial investment; do not invest money that you cannot afford to lose. Educate yourself on the risks associated with foreign exchange trading and seek advice from an independent financial or tax advisor if you have any questions.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/5 px-5 py-4">
+            <p className="text-xs text-amber-700 dark:text-amber-300/80 leading-relaxed text-justify">
+              <strong className="text-amber-600 dark:text-amber-400 font-bold">Advisory warning: </strong>
+              UpDownLive is not an investment advisor, UpDownLive provides references and links to selected news, blogs and other sources of economic and market information for informational purposes and as an educational service to its clients and prospects and does not endorse the opinions or recommendations of the blogs or other sources of information. Clients and prospects are advised to carefully consider the opinions and analysis offered in the blogs or other information sources in the context of the client or prospect's individual analysis and decision making. None of the blogs or other sources of information is to be considered as constituting a track record. Past performance is no guarantee of future results and UpDownLive specifically advises clients and prospects to carefully review all claims and representations made by advisors, bloggers, money managers and system vendors before investing any funds or opening an account with any Forex dealer. Any news, opinions, research, data, or other information contained within this website is provided on an "as-is" basis as a general market commentary and does not constitute investment or trading advice. UpDownLive expressly disclaims any liability for any lost principal or profits which may arise directly or indirectly from the use of or reliance on such information.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/5 px-5 py-4">
+            <p className="text-xs text-red-700 dark:text-red-300/80 leading-relaxed text-justify">
+              <strong className="text-red-600 dark:text-red-400 font-bold">Disclaimer: </strong>
+              UpDownLive may be compensated by the advertisers that appear on the website, based on your interaction with the advertisements or advertisers.
+            </p>
+          </div>
         </div>
 
       </div>
