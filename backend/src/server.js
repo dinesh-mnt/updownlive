@@ -21,6 +21,19 @@ import connectDB from './config/db.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Connect on module load — critical for Vercel cold starts
+connectDB().catch(err => console.error('Initial DB connect failed:', err.message));
+
+// Re-ensure connection before every request (handles dropped connections)
+app.use(async (_req, _res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.set('trust proxy', 1);
 
 const allowedOrigins = [
@@ -85,10 +98,16 @@ app.get('/health', (_req, res) => {
   });
 });
 
-if (process.env.NODE_ENV !== 'test' && process.env.VERCEL !== '1') {
-  app.listen(PORT, async () => {
+// Global error handler
+app.use((err, _req, res, _next) => {
+  console.error('Unhandled error:', err.message);
+  res.status(500).json({ message: err.message || 'Internal server error' });
+});
+
+// Only start HTTP server when not on Vercel
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    await connectDB();
   });
 }
 

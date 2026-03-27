@@ -1,46 +1,43 @@
 import mongoose from 'mongoose';
 
-import User from '../models/User.js';
+// Cache the connection across serverless invocations
+let cached = global._mongooseCache;
+if (!cached) {
+  cached = global._mongooseCache = { conn: null, promise: null };
+}
 
 const connectDB = async () => {
-  try {
-    const dbUri = process.env.DATABASE_URI || process.env.MONGODB_URI;
-    
-    if (!dbUri) {
-      console.error('❌ Database connection error: DATABASE_URI is not defined in the environment variables.');
-      process.exit(1);
-    }
-
-    console.log('🔄 Attempting to connect to MongoDB...');
-    
-    // Optimize connection for serverless
-    const conn = await mongoose.connect(dbUri, {
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-    });
-    
-    console.log(`✅ MongoDB Successfully Connected!`);
-    console.log(`🔗 Host: ${conn.connection.host}`);
-    console.log(`📂 Database: ${conn.connection.name}`);
-    console.log(`📊 State: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Error'}`);
-    
-    // Seed Admin User (only in development)
-    if (process.env.NODE_ENV !== 'production' && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
-      const adminExists = await User.findOne({ email: process.env.ADMIN_EMAIL });
-      if (!adminExists) {
-        await User.create({
-          name: 'Super Admin',
-          email: process.env.ADMIN_EMAIL,
-          password: process.env.ADMIN_PASSWORD,
-          role: 'admin'
-        });
-        console.log(`✅ Admin user seeded: ${process.env.ADMIN_EMAIL}`);
-      }
-    }
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+  // Already connected — reuse
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
   }
+
+  const uri = process.env.DATABASE_URI || process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error('DATABASE_URI is not defined in environment variables');
+  }
+
+  // If a connection is in progress, wait for it
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      bufferCommands: false, // Fail fast instead of buffering when disconnected
+    }).then((m) => {
+      console.log(`✅ MongoDB connected: ${m.connection.host}`);
+      return m;
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    cached.promise = null; // Reset so next request retries
+    throw err;
+  }
+
+  return cached.conn;
 };
 
 export default connectDB;
