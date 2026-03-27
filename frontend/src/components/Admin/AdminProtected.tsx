@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { Loader2, Shield, AlertTriangle } from 'lucide-react';
-import { authClient } from '@/lib/auth-client';
+import { signOut } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
 import Link from 'next/link';
@@ -31,45 +31,29 @@ export default function AdminProtected({ children, fallback }: AdminProtectedPro
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Shield size={40} className="text-red-600" />
           </div>
-          
           <h1 className="text-3xl font-black text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-2 font-medium">
-            You don't have permission to access this admin area.
-          </p>
-          <p className="text-sm text-gray-500 mb-8">
-            This section is restricted to administrators only.
-          </p>
-          
+          <p className="text-gray-600 mb-2 font-medium">You don't have permission to access this admin area.</p>
+          <p className="text-sm text-gray-500 mb-8">This section is restricted to administrators only.</p>
           <div className="flex items-center justify-center gap-2 mb-6 p-3 bg-amber-50 border border-amber-200 rounded-xl">
             <AlertTriangle size={16} className="text-amber-600" />
-            <span className="text-xs font-bold text-amber-700 uppercase tracking-wide">
-              Unauthorized Access Attempt
-            </span>
+            <span className="text-xs font-bold text-amber-700 uppercase tracking-wide">Unauthorized Access Attempt</span>
           </div>
-          
           {user && (
             <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-xl">
               <p className="text-xs text-blue-600 font-medium">
                 Logged in as: <span className="font-bold">{user.email}</span>
               </p>
               <p className="text-xs text-blue-500 mt-1">
-                Role: <span className="font-bold capitalize">{(user as any)?.role || 'User'}</span>
+                Role: <span className="font-bold capitalize">{user.role || 'User'}</span>
               </p>
             </div>
           )}
-          
           <div className="space-y-3">
-            <Link 
-              href="/" 
-              className="block w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-brand-blue/20"
-            >
+            <Link href="/" className="block w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-brand-blue/20">
               Return to Homepage
             </Link>
-            <button 
-              onClick={() => {
-                authClient.signOut();
-                router.push('/admin/login');
-              }}
+            <button
+              onClick={async () => { await signOut(); router.push('/admin/login'); }}
               className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-all text-sm"
             >
               Sign Out & Login as Admin
@@ -80,10 +64,6 @@ export default function AdminProtected({ children, fallback }: AdminProtectedPro
     );
   }
 
-  if (isAdmin) {
-    return <>{children}</>;
-  }
-
-  // Fallback - should not reach here
+  if (isAdmin) return <>{children}</>;
   return null;
 }

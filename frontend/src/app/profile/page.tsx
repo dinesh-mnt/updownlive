@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Website/Header/Header";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Website/Footer/Footer";
-import { authClient } from "@/lib/auth-client";
+import { useAuth, signOut } from "@/hooks/use-auth";
 import { User, Mail, Phone, MapPin, Calendar, LogOut, Loader2, Save, Edit2, CheckCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axiosInstance from '@/lib/axios';
@@ -22,7 +22,8 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { data: session, isPending } = authClient.useSession();
+  const { user: sessionUser, isPending } = useAuth();
+  const session = sessionUser ? { user: sessionUser } : null;
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -132,7 +133,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!isPending && !session) {
-      router.push("/admin/login");
+      router.push("/");
     }
   }, [isPending, session, router]);
 
@@ -449,7 +450,7 @@ export default function ProfilePage() {
                   <p className="text-brand-gray dark:text-gray-500 text-xs font-medium">Log out of your current session.</p>
                 </div>
                 <button 
-                  onClick={() => authClient.signOut().then(() => router.push('/'))}
+                  onClick={() => signOut().then(() => router.push('/'))}
                   className="flex items-center gap-2 px-8 py-4 bg-brand-red/10 text-brand-red border border-brand-red/20 rounded-2xl font-bold hover:bg-brand-red hover:text-white transition-all shadow-lg active:scale-95"
                 >
                   <LogOut size={18} />

@@ -1,16 +1,4 @@
 import Comment from '../models/Comment.js';
-import { createAuth } from '../config/auth.js';
-
-// Helper: get session from Better Auth
-async function getSession(req) {
-  try {
-    const auth = createAuth();
-    const session = await auth.api.getSession({ headers: req.headers });
-    return session;
-  } catch {
-    return null;
-  }
-}
 
 // GET /api/comments?articleUrl=...
 export const getComments = async (req, res) => {
@@ -26,14 +14,9 @@ export const getComments = async (req, res) => {
   }
 };
 
-// POST /api/comments
+// POST /api/comments  (requires JWT auth via protect middleware)
 export const createComment = async (req, res) => {
   try {
-    const session = await getSession(req);
-    if (!session?.user) {
-      return res.status(401).json({ success: false, message: 'You must be logged in to comment' });
-    }
-
     const { articleUrl, articleTitle, content } = req.body;
     if (!articleUrl || !articleTitle || !content?.trim()) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -42,9 +25,9 @@ export const createComment = async (req, res) => {
     const comment = await Comment.create({
       articleUrl,
       articleTitle,
-      userId: session.user.id,
-      userName: session.user.name,
-      userEmail: session.user.email,
+      userId: req.user._id,
+      userName: req.user.name,
+      userEmail: req.user.email,
       content: content.trim(),
     });
 
@@ -57,14 +40,6 @@ export const createComment = async (req, res) => {
 // DELETE /api/comments/:id  (admin only)
 export const deleteComment = async (req, res) => {
   try {
-    const session = await getSession(req);
-    if (!session?.user) {
-      return res.status(401).json({ success: false, message: 'Unauthorized' });
-    }
-    if (session.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Admin access required' });
-    }
-
     const comment = await Comment.findByIdAndDelete(req.params.id);
     if (!comment) {
       return res.status(404).json({ success: false, message: 'Comment not found' });
@@ -78,11 +53,6 @@ export const deleteComment = async (req, res) => {
 // GET /api/comments/all  (admin only)
 export const getAllComments = async (req, res) => {
   try {
-    const session = await getSession(req);
-    if (!session?.user || session.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Admin access required' });
-    }
-
     const comments = await Comment.find().sort({ createdAt: -1 });
     res.json({ success: true, comments });
   } catch (error) {

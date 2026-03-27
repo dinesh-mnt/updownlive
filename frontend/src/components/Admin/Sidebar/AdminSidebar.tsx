@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { 
   LogOut, LayoutDashboard, Settings, Globe, Database, User, ChevronDown, ChevronRight, Mail, Send, MessageSquare
 } from 'lucide-react';
-import { authClient } from '@/lib/auth-client';
+import { signOut } from '@/hooks/use-auth';
 
 export interface SubMenuItem {
   title: string;
@@ -102,7 +102,7 @@ export default function AdminSidebar() {
 
   const handleLogout = async () => {
     try {
-      await authClient.signOut();
+      await signOut();
       router.push('/admin/login');
     } catch (error) {
       console.error('Logout failed:', error);

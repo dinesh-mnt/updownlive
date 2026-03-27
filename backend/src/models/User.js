@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Please provide a password'],
       minlength: 6,
       select: false,
     },
@@ -24,6 +23,17 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    verifiedStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+    phone: String,
+    address: String,
+    city: String,
+    state: String,
+    zipcode: String,
+    country: String,
   },
   { timestamps: true }
 );
@@ -41,6 +51,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema, 'user');
 
 export default User;

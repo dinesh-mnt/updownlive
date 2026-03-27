@@ -5,7 +5,7 @@ import {
   LogOut, LayoutDashboard, Settings, Globe, Database, 
   TrendingUp, Users, Activity, Loader2, Eye, EyeOff, Save, Key, CheckCircle
 } from 'lucide-react';
-import { authClient } from '@/lib/auth-client';
+import { useAuth, signOut } from '@/hooks/use-auth';
 import axiosInstance from '@/lib/axios';
 
 export default function AdminDashboard() {
@@ -20,43 +20,27 @@ export default function AdminDashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const { user: sessionUser } = useAuth();
+
   useEffect(() => {
-    const fetchProfileAndSettings = async () => {
+    const fetchSettings = async () => {
       try {
-        const { data: sessionData, error } = await authClient.getSession();
-
-        if (error || !sessionData) {
-          throw new Error('Not authorized');
-        }
-        setProfile(sessionData.user);
-        
-        // Fetch Current API Key
-        try {
-          const res = await axiosInstance.get(`/settings/news-api-key`);
-          if (res.data?.apiKey) {
-            setNewsApiKey(res.data.apiKey);
-          }
-        } catch (setupErr) {
-          console.error('API key retrieval issue:', setupErr);
-        }
-
+        if (!sessionUser) { router.push('/admin/login'); return; }
+        setProfile(sessionUser);
+        const res = await axiosInstance.get(`/settings/news-api-key`);
+        if (res.data?.apiKey) setNewsApiKey(res.data.apiKey);
       } catch (err) {
-        router.push('/admin/login');
+        console.error('Settings fetch error:', err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProfileAndSettings();
-  }, [router]);
+    fetchSettings();
+  }, [sessionUser, router]);
 
   const handleLogout = async () => {
-    try {
-      await authClient.signOut();
-      router.push('/admin/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    await signOut();
+    router.push('/admin/login');
   };
 
   const handleSaveApiKey = async () => {
@@ -86,7 +70,7 @@ export default function AdminDashboard() {
       <div className="container-custom py-8 flex flex-col lg:flex-row gap-8">
         
         {/* Sidebar */}
-        <aside className="w-full lg:w-72 flex-shrink-0">
+        <aside className="w-full lg:w-72 shrink-0">
           <div className="bg-white border border-brand-border rounded-3xl p-6 shadow-sm sticky top-28">
             <div className="flex items-center gap-4 pb-6 mb-6 border-b border-brand-border">
               <div className="w-14 h-14 bg-brand-blue text-white rounded-full flex items-center justify-center text-2xl font-black shadow-lg shadow-brand-blue/20 uppercase">

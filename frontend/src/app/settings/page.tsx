@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Website/Header/Header";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Website/Footer/Footer";
-import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   User, 
   Palette, 
@@ -35,7 +35,8 @@ interface UserProfile {
 }
 
 export default function SettingsPage() {
-  const { data: session, isPending } = authClient.useSession();
+  const { user: sessionUser, isPending } = useAuth();
+  const session = sessionUser ? { user: sessionUser } : null;
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -75,7 +76,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!isPending && !session) {
-      router.push("/admin/login");
+      router.push("/");
     }
   }, [isPending, session, router]);
 

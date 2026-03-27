@@ -48,42 +48,7 @@ axiosInstance.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // Check if this is a login attempt - don't redirect for login failures
-          const isLoginAttempt = error.config?.url?.includes('/auth/login') ||
-            error.config?.url?.includes('/auth/admin/login') ||
-            error.config?.url?.includes('/auth/vendor') ||
-            error.config?.url?.includes('/vendors/login') ||
-            error.config?.url?.includes('/qc-checkers/login');
-
-          if (!isLoginAttempt) {
-            // Unauthorized - clear tokens and redirect to login (only for authenticated requests)
-            if (isBrowser) {
-              localStorage.removeItem('adminToken');
-              sessionStorage.removeItem('adminToken');
-              localStorage.removeItem('vendorToken');
-              localStorage.removeItem('vendorData');
-              localStorage.removeItem('checkerToken');
-              localStorage.removeItem('checkerData');
-              localStorage.removeItem('checkerID');
-              localStorage.removeItem('userToken');
-              sessionStorage.removeItem('userToken');
-              localStorage.removeItem('userData');
-              sessionStorage.removeItem('userData');
-            }
-            if (typeof window !== 'undefined') {
-              // Redirect based on current path
-              const currentPath = window.location.pathname;
-              if (currentPath.includes('/admin')) {
-                window.location.href = '/admin/login';
-              } else if (currentPath.includes('/vendor')) {
-                window.location.href = '/vendor';
-              } else if (currentPath.includes('/checker')) {
-                window.location.href = '/checker';
-              } else {
-                window.location.href = '/login';
-              }
-            }
-          }
+          // Just reject — callers handle unauthenticated state themselves
           break;
         case 403:
           // Forbidden

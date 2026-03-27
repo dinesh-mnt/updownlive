@@ -1,8 +1,3 @@
-import { createAuthClient } from "better-auth/react"
-
-export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_AUTH_URL || 'http://localhost:5000/api/auth',
-  fetchOptions: {
-    credentials: 'include',
-  },
-})
+// BetterAuth removed - using custom JWT + Google OAuth
+// All auth is handled via useAuth hook and direct API calls
+export {};

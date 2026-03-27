@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { MessageSquare, Send, Trash2, User, Loader2 } from 'lucide-react';
-import { authClient } from '@/lib/auth-client';
+import { useAuth } from '@/hooks/use-auth';
 
 interface Comment {
   _id: string;
@@ -17,7 +17,8 @@ interface Props {
 }
 
 export default function CommentSection({ articleUrl, articleTitle }: Props) {
-  const { data: session } = authClient.useSession();
+  const { user: sessionUser } = useAuth();
+  const session = sessionUser ? { user: sessionUser } : null;
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
@@ -134,7 +135,7 @@ export default function CommentSection({ articleUrl, articleTitle }: Props) {
         <div className="space-y-4">
           {comments.map(comment => (
             <div key={comment._id} className="flex gap-3 group">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-blue to-brand-red flex items-center justify-center shrink-0 text-white text-sm font-bold">
+              <div className="w-9 h-9 rounded-full bg-linear-to-br from-brand-blue to-brand-red flex items-center justify-center shrink-0 text-white text-sm font-bold">
                 {comment.userName.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 bg-brand-light dark:bg-zinc-800 rounded-2xl px-4 py-3 border border-brand-border dark:border-white/10">

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, memo } from "react";
-import { TrendingUp, DollarSign, Coins, BarChart3, LineChart, Activity, Bitcoin, ArrowRight } from "lucide-react";
+import React, { useState } from "react";
+import { TrendingUp, DollarSign, Coins, BarChart3, LineChart, Bitcoin } from "lucide-react";
 import TradingViewChart from "@/components/TradingViewChart";
 
 interface ChartType {
@@ -14,20 +14,20 @@ interface ChartType {
 
 const chartTypes: ChartType[] = [
   {
-    id: "realtime",
-    title: "Real-Time Charts",
-    description: "Live updating charts that show price movement instantly. Used in trading platforms like TradingView.",
-    icon: <Activity size={24} />,
-    symbol: "NASDAQ:AAPL",
-    color: "blue",
-  },
-  {
     id: "forex",
     title: "Currency Chart (Forex)",
     description: "Shows exchange rates like USD/INR, EUR/USD. Used for forex trading & analysis.",
     icon: <DollarSign size={24} />,
     symbol: "FX:EURUSD",
     color: "green",
+  },
+  {
+    id: "forex2",
+    title: "Forex Charts",
+    description: "Major and minor currency pairs with live price action and technical overlays.",
+    icon: <LineChart size={24} />,
+    symbol: "FX:GBPUSD",
+    color: "blue",
   },
   {
     id: "futures",
@@ -38,20 +38,20 @@ const chartTypes: ChartType[] = [
     color: "yellow",
   },
   {
+    id: "gold",
+    title: "Gold Charts",
+    description: "Live gold, silver, and precious metals spot prices and futures.",
+    icon: <Coins size={24} />,
+    symbol: "COMEX:GC1!",
+    color: "orange",
+  },
+  {
     id: "stocks",
     title: "Stocks Chart",
     description: "Shows company stock prices like Apple (AAPL), Tesla (TSLA).",
-    icon: <LineChart size={24} />,
+    icon: <BarChart3 size={24} />,
     symbol: "NASDAQ:TSLA",
     color: "purple",
-  },
-  {
-    id: "indices",
-    title: "Indices Chart",
-    description: "Tracks market indices like Nifty 50, S&P 500.",
-    icon: <BarChart3 size={24} />,
-    symbol: "SP:SPX",
-    color: "red",
   },
   {
     id: "crypto",
@@ -59,23 +59,23 @@ const chartTypes: ChartType[] = [
     description: "Shows crypto prices like Bitcoin (BTC), Ethereum (ETH).",
     icon: <Bitcoin size={24} />,
     symbol: "BINANCE:BTCUSDT",
-    color: "orange",
+    color: "red",
   },
 ];
 
 // Per-category symbol options
 const symbolOptions: Record<string, { symbol: string; name: string }[]> = {
-  realtime: [
-    { symbol: "NASDAQ:AAPL", name: "Apple" },
-    { symbol: "NASDAQ:MSFT", name: "Microsoft" },
-    { symbol: "NYSE:NVDA", name: "NVIDIA" },
-    { symbol: "NASDAQ:AMZN", name: "Amazon" },
-  ],
   forex: [
     { symbol: "FX:EURUSD", name: "EUR/USD" },
     { symbol: "FX:GBPUSD", name: "GBP/USD" },
     { symbol: "FX:USDJPY", name: "USD/JPY" },
     { symbol: "FX:AUDUSD", name: "AUD/USD" },
+  ],
+  forex2: [
+    { symbol: "FX:GBPUSD", name: "GBP/USD" },
+    { symbol: "FX:USDCAD", name: "USD/CAD" },
+    { symbol: "FX:USDCHF", name: "USD/CHF" },
+    { symbol: "FX:NZDUSD", name: "NZD/USD" },
   ],
   futures: [
     { symbol: "COMEX:GC1!", name: "Gold" },
@@ -83,17 +83,17 @@ const symbolOptions: Record<string, { symbol: string; name: string }[]> = {
     { symbol: "CBOT:ZW1!", name: "Wheat" },
     { symbol: "NYMEX:NG1!", name: "Nat. Gas" },
   ],
+  gold: [
+    { symbol: "COMEX:GC1!", name: "Gold Futures" },
+    { symbol: "COMEX:SI1!", name: "Silver Futures" },
+    { symbol: "COMEX:PL1!", name: "Platinum" },
+    { symbol: "TVC:GOLD", name: "Gold Spot" },
+  ],
   stocks: [
     { symbol: "NASDAQ:TSLA", name: "Tesla" },
     { symbol: "NASDAQ:GOOGL", name: "Alphabet" },
     { symbol: "NYSE:JPM", name: "JPMorgan" },
     { symbol: "NYSE:BAC", name: "Bank of America" },
-  ],
-  indices: [
-    { symbol: "SP:SPX", name: "S&P 500" },
-    { symbol: "NASDAQ:QQQ", name: "NASDAQ 100" },
-    { symbol: "TVC:DJI", name: "Dow Jones" },
-    { symbol: "NSE:NIFTY50", name: "Nifty 50" },
   ],
   crypto: [
     { symbol: "BINANCE:BTCUSDT", name: "Bitcoin" },
@@ -116,14 +116,13 @@ export default function Charts() {
   const [selectedChart, setSelectedChart] = useState<ChartType>(chartTypes[0]);
   const [selectedSymbol, setSelectedSymbol] = useState(symbolOptions[chartTypes[0].id][0]);
 
-  // When chart category changes, reset symbol to first option
   const handleChartChange = (chart: ChartType) => {
     setSelectedChart(chart);
     setSelectedSymbol(symbolOptions[chart.id][0]);
   };
 
-  const colors = colorMap[selectedChart.color];
-  const symbols = symbolOptions[selectedChart.id];
+  const colors = colorMap[selectedChart.color] ?? colorMap.blue;
+  const symbols = symbolOptions[selectedChart.id] ?? [];
 
   return (
     <div className="bg-white dark:bg-black min-h-screen font-sans transition-colors duration-300">

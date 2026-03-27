@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Search, MonitorPlay, Home, User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
-import { authClient } from '@/lib/auth-client';
+import { useAuth, signOut } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -12,7 +12,8 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
+  const { user, isPending } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -27,13 +28,10 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    await authClient.signOut();
+    await signOut();
     setIsProfileOpen(false);
     router.push('/');
   };
-
-  const user = session?.user;
-  const isAdmin = (user as any)?.role === 'admin';
 
   return (
     <nav className="bg-white dark:bg-black border-b border-brand-border dark:border-white/10 sticky top-0 z-50 backdrop-blur-md shadow-lg font-outfit transition-colors duration-300">
@@ -81,7 +79,7 @@ export default function Navbar() {
           <ThemeToggle />
           {isPending ? (
             <div className="w-28 h-10 bg-white/5 animate-pulse rounded-lg"></div>
-          ) : session ? (
+          ) : user ? (
             <div className="relative" ref={dropdownRef}>
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -180,7 +178,7 @@ export default function Navbar() {
       {/* Mobile/Tablet Menu Container */}
       {isMenuOpen && (
         <div className="xl:hidden flex flex-col px-6 py-4 bg-white dark:bg-zinc-900 border-t border-brand-border dark:border-white/10 max-h-[calc(100vh-80px)] overflow-y-auto transition-colors duration-300">
-          {session && (
+          {user && (
             <div className="mb-8 p-4 bg-brand-light dark:bg-white/5 rounded-2xl border border-brand-border dark:border-white/10">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-linear-to-br from-brand-blue to-brand-blue/60 flex items-center justify-center text-white font-bold">
@@ -235,7 +233,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          {!session ? (
+          {!user ? (
             <Link href="/admin/login" className="bg-brand-blue text-white text-center mt-6 py-4 rounded-lg font-semibold w-full shadow-lg shadow-brand-blue/30" onClick={() => setIsMenuOpen(false)}>
               Log In
             </Link>

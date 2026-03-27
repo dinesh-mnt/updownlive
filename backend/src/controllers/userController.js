@@ -1,176 +1,60 @@
-import { getMongoClient } from '../config/auth.js';
+import User from '../models/User.js';
 
 export const getUserById = async (req, res) => {
-    const { userId } = req.params;
-    
-    try {
-        const client = await getMongoClient();
-        const db = client.db();
-        
-        // Try to find user by 'id' field first (Better Auth standard)
-        let user = await db.collection('user').findOne({ id: userId });
-        
-        // If not found, try with MongoDB's _id field
-        if (!user) {
-            try {
-                const { ObjectId } = await import('mongodb');
-                user = await db.collection('user').findOne({ _id: new ObjectId(userId) });
-            } catch (objectIdError) {
-                // If ObjectId conversion fails, try as string _id
-                user = await db.collection('user').findOne({ _id: userId });
-            }
-        }
-        
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        
-        // Ensure user has proper default values
-        const processedUser = {
-            ...user,
-            role: user.role || 'user',
-            verifiedStatus: user.verifiedStatus || 'pending'
-        };
-        
-        res.json(processedUser);
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Internal server error while fetching user' });
-    }
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 export const getUsers = async (req, res) => {
-    try {
-        const client = await getMongoClient();
-        const db = client.db();
-        
-        // Return all users except admins, including Google OAuth users
-        // Make sure to include users with null/undefined role (default to 'user')
-        const users = await db.collection('user').find({ 
-            $or: [
-                { role: { $ne: 'admin' } },
-                { role: { $exists: false } },
-                { role: null }
-            ]
-        }).toArray();
-        
-        // Ensure all users have proper default values
-        const processedUsers = users.map(user => ({
-            ...user,
-            role: user.role || 'user',
-            verifiedStatus: user.verifiedStatus || 'pending'
-        }));
-        
-        res.json(processedUsers);
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ message: 'Internal server error while fetching users' });
-    }
+  try {
+    const users = await User.find({ role: { $ne: 'admin' } }).select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 export const updateUserStatus = async (req, res) => {
-    const { userId } = req.params;
-    const { status } = req.body; // approved, rejected
+  const { userId } = req.params;
+  const { status } = req.body;
 
-    if (!['approved', 'rejected'].includes(status)) {
-        return res.status(400).json({ message: 'Invalid status' });
-    }
+  if (!['approved', 'rejected'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
 
-    try {
-        const client = await getMongoClient();
-        const db = client.db();
-        
-        // Better Auth typically uses 'id' field, but we'll try both for compatibility
-        let result;
-        
-        // First try with the 'id' field (Better Auth standard)
-        result = await db.collection('user').updateOne(
-            { id: userId },
-            { $set: { verifiedStatus: status } }
-        );
-        
-        // If no match found, try with MongoDB's _id field
-        if (result.matchedCount === 0) {
-            try {
-                const { ObjectId } = await import('mongodb');
-                result = await db.collection('user').updateOne(
-                    { _id: new ObjectId(userId) },
-                    { $set: { verifiedStatus: status } }
-                );
-            } catch (objectIdError) {
-                // If ObjectId conversion fails, the userId format is invalid
-                console.log('Invalid ObjectId format, trying as string _id');
-                result = await db.collection('user').updateOne(
-                    { _id: userId },
-                    { $set: { verifiedStatus: status } }
-                );
-            }
-        }
-
-        if (result.matchedCount === 0) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.json({ message: `User status updated to ${status} successfully` });
-    } catch (error) {
-        console.error('Error updating user status:', error);
-        res.status(500).json({ message: 'Internal server error while updating user status' });
-    }
+  try {
+    const user = await User.findByIdAndUpdate(userId, { verifiedStatus: status }, { new: true });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: `User status updated to ${status}` });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 export const updateUserProfile = async (req, res) => {
-    const { userId } = req.params;
-    const { name, phone, address, city, state, zipcode, country } = req.body;
+  const { userId } = req.params;
+  const { name, phone, address, city, state, zipcode, country } = req.body;
 
-    try {
-        const client = await getMongoClient();
-        const db = client.db();
-        
-        // Build update object with only provided fields
-        const updateData = {};
-        if (name !== undefined) updateData.name = name;
-        if (phone !== undefined) updateData.phone = phone;
-        if (address !== undefined) updateData.address = address;
-        if (city !== undefined) updateData.city = city;
-        if (state !== undefined) updateData.state = state;
-        if (zipcode !== undefined) updateData.zipcode = zipcode;
-        if (country !== undefined) updateData.country = country;
-        
-        // Add updated timestamp
-        updateData.updatedAt = new Date();
-        
-        let result;
-        
-        // First try with the 'id' field (Better Auth standard)
-        result = await db.collection('user').updateOne(
-            { id: userId },
-            { $set: updateData }
-        );
-        
-        // If no match found, try with MongoDB's _id field
-        if (result.matchedCount === 0) {
-            try {
-                const { ObjectId } = await import('mongodb');
-                result = await db.collection('user').updateOne(
-                    { _id: new ObjectId(userId) },
-                    { $set: updateData }
-                );
-            } catch (objectIdError) {
-                console.log('Invalid ObjectId format, trying as string _id');
-                result = await db.collection('user').updateOne(
-                    { _id: userId },
-                    { $set: updateData }
-                );
-            }
-        }
+  try {
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+    if (city !== undefined) updateData.city = city;
+    if (state !== undefined) updateData.state = state;
+    if (zipcode !== undefined) updateData.zipcode = zipcode;
+    if (country !== undefined) updateData.country = country;
 
-        if (result.matchedCount === 0) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.json({ message: 'Profile updated successfully', data: updateData });
-    } catch (error) {
-        console.error('Error updating user profile:', error);
-        res.status(500).json({ message: 'Internal server error while updating profile' });
-    }
+    const user = await User.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'Profile updated successfully', data: user });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
