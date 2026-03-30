@@ -1,89 +1,41 @@
 import axios from 'axios';
+import mongoose from 'mongoose';
 
-/**
- * Fetch Forex News from NewsAPI
- * GET /api/forex/news
- */
+// GET /api/forex/news
 export const getForexNews = async (req, res) => {
   try {
-    const apiKey = process.env.NEWS_API_KEY;
-    
+    const db = mongoose.connection.db;
+    const setting = await db.collection('settings').findOne({ key: 'newsApiKey' });
+    const apiKey = setting?.value;
+
     if (!apiKey) {
-      return res.status(500).json({ 
-        error: 'NewsAPI key not configured',
-        message: 'Please add NEWS_API_KEY to your environment variables'
-      });
+      return res.status(500).json({ error: 'API key not configured. Set it in Admin → API Integration.' });
     }
 
-    const response = await axios.get('https://newsapi.org/v2/everything', {
-      params: {
-        q: 'forex OR currency OR "foreign exchange" OR USD OR EUR OR GBP OR JPY',
-        language: 'en',
-        sortBy: 'publishedAt',
-        pageSize: 100,
-        apiKey: apiKey,
-      },
-      timeout: 10000, // 10 second timeout
+    console.log('Using ForexNewsAPI token (first 8 chars):', apiKey.substring(0, 8));
+
+    const { data } = await axios.get('https://forexnewsapi.com/api/v1/category', {
+      params: { section: 'general', items: 100, page: 1, token: apiKey },
+      timeout: 10000,
     });
 
-    // Transform NewsAPI response to match your ForexArticle interface
-    const articles = response.data.articles.map((article, index) => ({
-      id: article.url ? `${Buffer.from(article.url).toString('base64').substring(0, 12)}-${index}` : `article-${Date.now()}-${index}`,
-      title: article.title || 'Untitled',
-      subtitle: article.description || article.content?.substring(0, 200) || '',
-      author: article.author || article.source?.name || 'Unknown',
-      publishedAt: article.publishedAt || new Date().toISOString(),
-      imageUrl: article.urlToImage || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
-      url: article.url || '#',
-      body: article.content || article.description || '',
-      source: article.source?.name || 'NewsAPI',
-      currencies: extractCurrencies(article.title + ' ' + article.description),
+    const articles = (data?.data || []).map((item, i) => ({
+      id: `forex-${i}-${Date.now()}`,
+      title: item.title || 'Untitled',
+      text: item.text || '',
+      source_name: item.source_name || 'Unknown',
+      date: item.date ? new Date(item.date).toISOString() : new Date().toISOString(),
+      image_url: item.image_url || '',
+      news_url: item.news_url || '#',
+      topics: Array.isArray(item.topics) ? item.topics : [],
+      sentiment: item.sentiment || '',
+      currency: Array.isArray(item.currency) ? item.currency : [],
+      type: item.type || 'Article',
     }));
 
-    res.json({
-      success: true,
-      count: articles.length,
-      articles: articles,
-    });
-
+    res.json({ success: true, count: articles.length, articles });
   } catch (error) {
-    console.error('Error fetching forex news:', error.message);
-    
-    if (error.response?.status === 429) {
-      return res.status(429).json({ 
-        error: 'Rate limit exceeded',
-        message: 'NewsAPI rate limit reached. Please try again later.'
-      });
-    }
-    
-    if (error.response?.status === 401) {
-      return res.status(401).json({ 
-        error: 'Invalid API key',
-        message: 'NewsAPI key is invalid. Please check your configuration.'
-      });
-    }
-
-    res.status(500).json({ 
-      error: 'Failed to fetch forex news',
-      message: error.message 
-    });
+    console.error('Error fetching forex news:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch forex news', message: error.message });
   }
 };
-
-/**
- * Extract currency codes from text
- */
-function extractCurrencies(text) {
-  if (!text) return [];
-  
-  const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'NZD', 'SEK'];
-  const found = [];
-  
-  currencies.forEach(currency => {
-    if (text.toUpperCase().includes(currency)) {
-      found.push(currency);
-    }
-  });
-  
-  return [...new Set(found)]; // Remove duplicates
-}

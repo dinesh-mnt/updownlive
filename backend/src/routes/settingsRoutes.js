@@ -84,6 +84,9 @@ addApiKeyRoutes(router, 'crypto-api-key', 'cryptoApiKey');
 // Gold / Precious Metals — Metals.live
 addApiKeyRoutes(router, 'metals-api-key', 'metalsApiKey');
 
+// Stocks
+addApiKeyRoutes(router, 'stocks-api-key', 'stocksApiKey');
+
 // GET social media links
 router.get('/social-media', async (req, res) => {
   try {

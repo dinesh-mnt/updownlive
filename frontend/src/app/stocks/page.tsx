@@ -1,19 +1,16 @@
-import Header from "@/components/Website/Header/Header";
+import Navbar from "@/components/Website/Header/Header";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Website/Footer/Footer";
-import ForexPage from '@/components/Website/Forex/Forex';
-import { getSeoMetadata } from "@/lib/seo";
+import StocksPage from "@/components/Website/Stocks/Stocks";
 
-export async function generateMetadata() {
-  return getSeoMetadata("forex");
-}
+export const metadata = { title: "Stocks | UpDownLive" };
 
 export default function Page() {
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
-      <Header />
+      <Navbar />
       <MarketTicker />
-      <ForexPage />
+      <StocksPage />
       <Footer />
     </div>
   );

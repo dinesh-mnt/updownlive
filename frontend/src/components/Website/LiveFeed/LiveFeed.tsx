@@ -1,261 +1,139 @@
 "use client";
 
 import React, { useState, useEffect, memo } from "react";
-import { Clock, Coins, Newspaper } from "lucide-react";
+import { Clock, Coins, Newspaper, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { setArticle } from "@/lib/articleStore";
 
-// ==========================================
-// Types
-// ==========================================
-interface ForexArticle {
+interface Article {
   id: string;
   title: string;
-  subtitle: string;
-  author: string;
-  publishedAt: string;
-  imageUrl: string;
-  url: string;
-  body: string;
-  source: string;
-  currencies: string[];
+  text: string;
+  source_name: string;
+  date: string;
+  image_url: string;
+  news_url: string;
+  topics: string[];
+  sentiment: string;
+  currency: string[];
+  type: string;
 }
 
-interface GoldArticle {
-  id: string;
-  title: string;
-  subtitle: string;
-  author: string;
-  publishedAt: string;
-  imageUrl: string;
-  url: string;
-  body: string;
-  source: string;
-  tags: string[];
-}
-
-interface CryptoArticle {
-  id: string;
-  title: string;
-  subtitle: string;
-  author: string;
-  publishedAt: string;
-  imageUrl: string;
-  url: string;
-  body: string;
-  source: string;
-  tags: string[];
-}
-
-// ==========================================
-// Helper Functions
-// ==========================================
 function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
+  if (!dateStr) return '';
+  const parsed = new Date(dateStr);
+  if (isNaN(parsed.getTime())) return dateStr;
+  const diff = Date.now() - parsed.getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins} minute${mins !== 1 ? "s" : ""} ago`;
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs} hour${hrs !== 1 ? "s" : ""} ago`;
-  return `${Math.floor(hrs / 24)} day${Math.floor(hrs / 24) !== 1 ? "s" : ""} ago`;
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
 }
 
-// ==========================================
-// Gold News Card Component
-// ==========================================
-const GoldNewsCard = memo(({ article }: { article: GoldArticle }) => {
+function SentimentDot({ sentiment }: { sentiment: string }) {
+  const s = sentiment?.toLowerCase();
+  if (s === "positive") return <TrendingUp size={11} className="text-emerald-500 shrink-0" />;
+  if (s === "negative") return <TrendingDown size={11} className="text-red-500 shrink-0" />;
+  return <Minus size={11} className="text-gray-400 shrink-0" />;
+}
+
+// ── Shared Card ──────────────────────────────────────────────────────────────
+const NewsCard = memo(({ article, prefix, tagColor }: {
+  article: Article;
+  prefix: string;
+  tagColor: string;
+}) => {
   const router = useRouter();
 
   const handleRoute = (e: React.MouseEvent) => {
     e.preventDefault();
-    sessionStorage.setItem(`gold_${article.id}`, JSON.stringify(article));
-    router.push(`/gold/${article.id}`);
+    setArticle(`${prefix}_${article.id}`, article);
+    router.push(`/${prefix}/${article.id}`);
   };
 
   return (
     <a
-      href={article.url}
+      href={article.news_url}
       onClick={handleRoute}
       className="group bg-white dark:bg-zinc-900 rounded-2xl border border-brand-border dark:border-white/10 overflow-hidden hover:shadow-xl hover:shadow-brand-blue/8 hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
     >
-      <div className="relative overflow-hidden h-48 bg-gray-100 dark:bg-zinc-800 shrink-0">
-        <img
-          src={article.imageUrl}
-          alt={article.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&q=80";
-          }}
-        />
-        {article.tags.length > 0 && (
-          <div className="absolute top-2.5 left-2.5 flex gap-1">
-            {article.tags.slice(0, 3).map(t => (
-              <span key={t} className="text-xs font-black text-white bg-yellow-500/90 backdrop-blur px-2 py-0.5 rounded-md">
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
+      {article.image_url ? (
+        <div className="relative overflow-hidden h-48 bg-gray-100 dark:bg-zinc-800 shrink-0">
+          <img
+            src={article.image_url}
+            alt={article.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          {(article.currency?.length ?? 0) > 0 && (
+            <div className="absolute top-2.5 left-2.5 flex gap-1 flex-wrap">
+              {article.currency.slice(0, 3).map(c => (
+                <span key={c} className={`text-xs font-black text-white ${tagColor} backdrop-blur px-2 py-0.5 rounded-md`}>{c}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="h-48 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+          <Newspaper size={32} className="text-gray-300 dark:text-zinc-600" />
+        </div>
+      )}
+
       <div className="flex flex-col flex-1 p-5 gap-2">
         <h3 className="font-extrabold text-brand-black dark:text-white text-base leading-snug line-clamp-3 group-hover:text-brand-blue transition-colors">
           {article.title}
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 flex-1">
-          {article.subtitle}
+          {article.text}
         </p>
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/10 mt-2">
-          <span className="text-sm font-semibold text-brand-blue truncate max-w-[60%]">{article.author}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1 shrink-0">
-            <Clock size={12} /> {timeAgo(article.publishedAt)}
-          </span>
-        </div>
-      </div>
-    </a>
-  );
-});
-GoldNewsCard.displayName = "GoldNewsCard";
-
-// ==========================================
-// Crypto News Card Component
-// ==========================================
-const CryptoNewsCard = memo(({ article }: { article: CryptoArticle }) => {
-  const router = useRouter();
-
-  const handleRoute = (e: React.MouseEvent) => {
-    e.preventDefault();
-    sessionStorage.setItem(`crypto_${article.id}`, JSON.stringify(article));
-    router.push(`/crypto/${article.id}`);
-  };
-
-  return (
-    <a
-      href={article.url}
-      onClick={handleRoute}
-      className="group bg-white dark:bg-zinc-900 rounded-2xl border border-brand-border dark:border-white/10 overflow-hidden hover:shadow-xl hover:shadow-brand-blue/8 hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
-    >
-      <div className="relative overflow-hidden h-48 bg-gray-100 dark:bg-zinc-800 shrink-0">
-        <img
-          src={article.imageUrl}
-          alt={article.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "https://images.unsplash.com/photo-1640826514546-05db5ac9e6e8?w=400&q=80";
-          }}
-        />
-        {article.tags.length > 0 && (
-          <div className="absolute top-2.5 left-2.5 flex gap-1">
-            {article.tags.slice(0, 3).map(t => (
-              <span key={t} className="text-xs font-black text-white bg-indigo-500/90 backdrop-blur px-2 py-0.5 rounded-md">
-                {t}
-              </span>
+        {(article.topics?.length ?? 0) > 0 && (
+          <div className="flex gap-1 flex-wrap">
+            {article.topics.slice(0, 3).map(t => (
+              <span key={t} className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-gray-200 dark:border-white/10">{t}</span>
             ))}
           </div>
         )}
-      </div>
-      <div className="flex flex-col flex-1 p-5 gap-2">
-        <h3 className="font-extrabold text-brand-black dark:text-white text-base leading-snug line-clamp-3 group-hover:text-brand-blue transition-colors">
-          {article.title}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 flex-1">
-          {article.subtitle}
-        </p>
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/10 mt-2">
-          <span className="text-sm font-semibold text-brand-blue truncate max-w-[60%]">{article.author}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1 shrink-0">
-            <Clock size={12} /> {timeAgo(article.publishedAt)}
-          </span>
-        </div>
-      </div>
-    </a>
-  );
-});
-CryptoNewsCard.displayName = "CryptoNewsCard";
-
-// ==========================================
-// Forex News Card Component
-// ==========================================
-const ForexNewsCard = memo(({ article }: { article: ForexArticle }) => {
-  const router = useRouter();
-
-  const handleRoute = (e: React.MouseEvent) => {
-    e.preventDefault();
-    sessionStorage.setItem(`forex_${article.id}`, JSON.stringify(article));
-    router.push(`/forex/${article.id}`);
-  };
-
-  return (
-    <a
-      href={article.url}
-      onClick={handleRoute}
-      className="group bg-white dark:bg-zinc-900 rounded-2xl border border-brand-border dark:border-white/10 overflow-hidden hover:shadow-xl hover:shadow-brand-blue/8 hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
-    >
-      <div className="relative overflow-hidden h-48 bg-gray-100 dark:bg-zinc-800 shrink-0">
-        <img
-          src={article.imageUrl}
-          alt={article.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80";
-          }}
-        />
-        {article.currencies.length > 0 && (
-          <div className="absolute top-2.5 left-2.5 flex gap-1">
-            {article.currencies.slice(0, 3).map(c => (
-              <span key={c} className="text-xs font-black text-white bg-brand-blue/90 backdrop-blur px-2 py-0.5 rounded-md">
-                {c}
-              </span>
-            ))}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/10 mt-1">
+          <span className="text-sm font-semibold text-brand-blue truncate max-w-[60%]">{article.source_name}</span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {article.sentiment && <SentimentDot sentiment={article.sentiment} />}
+            <span className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1">
+              <Clock size={11} /> {timeAgo(article.date)}
+            </span>
           </div>
-        )}
-      </div>
-      <div className="flex flex-col flex-1 p-5 gap-2">
-        <h3 className="font-extrabold text-brand-black dark:text-white text-base leading-snug line-clamp-3 group-hover:text-brand-blue transition-colors">
-          {article.title}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 flex-1">
-          {article.subtitle}
-        </p>
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/10 mt-2">
-          <span className="text-sm font-semibold text-brand-blue truncate max-w-[60%]">{article.author}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1 shrink-0">
-            <Clock size={12} /> {timeAgo(article.publishedAt)}
-          </span>
         </div>
       </div>
     </a>
   );
 });
-ForexNewsCard.displayName = "ForexNewsCard";
+NewsCard.displayName = "NewsCard";
 
-// ==========================================
-// Main Component
-// ==========================================
+// ── Main Component ───────────────────────────────────────────────────────────
 export default function LiveFeed() {
-  const [forexArticles, setForexArticles] = useState<ForexArticle[]>([]);
-  const [goldArticles, setGoldArticles] = useState<GoldArticle[]>([]);
-  const [cryptoArticles, setCryptoArticles] = useState<CryptoArticle[]>([]);
+  const [forexArticles, setForexArticles] = useState<Article[]>([]);
+  const [goldArticles, setGoldArticles] = useState<Article[]>([]);
+  const [cryptoArticles, setCryptoArticles] = useState<Article[]>([]);
   const [loadingForex, setLoadingForex] = useState(true);
   const [loadingGold, setLoadingGold] = useState(true);
   const [loadingCrypto, setLoadingCrypto] = useState(true);
 
   useEffect(() => {
-    fetch('/api/forex-news')
-      .then(r => r.ok ? r.json() : { articles: [] })
-      .then(d => setForexArticles(d.articles || []))
+    const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+    axios.get(`${api}/forex/news`)
+      .then(r => { if (r.data?.success) setForexArticles(r.data.articles || []); })
       .catch(() => {})
       .finally(() => setLoadingForex(false));
 
-    fetch('/api/gold-news')
-      .then(r => r.ok ? r.json() : { articles: [] })
-      .then(d => setGoldArticles(d.articles || []))
+    axios.get(`${api}/gold/news`)
+      .then(r => { if (r.data?.success) setGoldArticles(r.data.articles || []); })
       .catch(() => {})
       .finally(() => setLoadingGold(false));
 
-    fetch('/api/crypto-news')
-      .then(r => r.ok ? r.json() : { articles: [] })
-      .then(d => setCryptoArticles(d.articles || []))
+    axios.get(`${api}/crypto/news`)
+      .then(r => { if (r.data?.success) setCryptoArticles(r.data.articles || []); })
       .catch(() => {})
       .finally(() => setLoadingCrypto(false));
   }, []);
@@ -276,7 +154,6 @@ export default function LiveFeed() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 font-outfit min-h-screen relative z-10">
 
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 space-y-4 md:space-y-0 border-b border-brand-border dark:border-white/10 pb-8">
         <div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-brand-black dark:text-white tracking-tight">Live Feeds</h1>
@@ -290,7 +167,6 @@ export default function LiveFeed() {
 
       <div className="space-y-24">
 
-        {/* Forex News */}
         <section>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
@@ -303,12 +179,11 @@ export default function LiveFeed() {
           </div>
           {loadingForex ? <Spinner /> : forexArticles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {forexArticles.slice(0, 12).map(a => <ForexNewsCard key={a.id} article={a} />)}
+              {forexArticles.slice(0, 12).map(a => <NewsCard key={a.id} article={a} prefix="forex" tagColor="bg-brand-blue/90" />)}
             </div>
           ) : <EmptyState />}
         </section>
 
-        {/* Gold News */}
         <section>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-yellow-50 dark:bg-yellow-500/10 flex items-center justify-center">
@@ -321,12 +196,11 @@ export default function LiveFeed() {
           </div>
           {loadingGold ? <Spinner color="border-yellow-500" /> : goldArticles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {goldArticles.slice(0, 12).map(a => <GoldNewsCard key={a.id} article={a} />)}
+              {goldArticles.slice(0, 12).map(a => <NewsCard key={a.id} article={a} prefix="gold" tagColor="bg-yellow-500/90" />)}
             </div>
           ) : <EmptyState />}
         </section>
 
-        {/* Crypto News */}
         <section>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
@@ -339,7 +213,7 @@ export default function LiveFeed() {
           </div>
           {loadingCrypto ? <Spinner color="border-indigo-500" /> : cryptoArticles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {cryptoArticles.slice(0, 12).map(a => <CryptoNewsCard key={a.id} article={a} />)}
+              {cryptoArticles.slice(0, 12).map(a => <NewsCard key={a.id} article={a} prefix="crypto" tagColor="bg-indigo-500/90" />)}
             </div>
           ) : <EmptyState />}
         </section>

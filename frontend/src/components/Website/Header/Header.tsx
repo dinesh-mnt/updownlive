@@ -60,7 +60,7 @@ export default function Navbar() {
           >
             Live Feed
           </Link>
-          {['Economic Calendar', 'Forex', 'Gold', 'Crypto', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => {
+          {['Economic Calendar', 'Forex', 'Gold', 'Crypto', 'Stocks', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => {
             const href = `/${item.toLowerCase().replace(/\s+/g, '-')}`;
             return (
               <Link 
@@ -226,7 +226,7 @@ export default function Navbar() {
             <Link href="/live-feed" className="flex items-center gap-3 py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
               <MonitorPlay size={20} /> Live Feed
             </Link>
-            {['Economic Calendar', 'Forex', 'Gold', 'Crypto', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => (
+            {['Economic Calendar', 'Forex', 'Gold', 'Crypto', 'Stocks', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => (
                <Link key={item} href={`/${item.toLowerCase().replace(/\s+/g, '-')}`} className="py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
                  {item}
                </Link>

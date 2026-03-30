@@ -1,5 +1,9 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, '../../.env') });
 
 import express from 'express';
 import cors from 'cors';
@@ -13,6 +17,7 @@ import newsletterRoutes from './routes/newsletterRoutes.js';
 import forexRoutes from './routes/forexRoutes.js';
 import goldRoutes from './routes/goldRoutes.js';
 import cryptoRoutes from './routes/cryptoRoutes.js';
+import stockRoutes from './routes/stockRoutes.js';
 import newsRoutes from './routes/newsRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import economicCalendarRoutes from './routes/economicCalendarRoutes.js';
@@ -73,6 +78,7 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/forex', forexRoutes);
 app.use('/api/gold', goldRoutes);
 app.use('/api/crypto', cryptoRoutes);
+app.use('/api/stocks', stockRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/economic-calendar', economicCalendarRoutes);

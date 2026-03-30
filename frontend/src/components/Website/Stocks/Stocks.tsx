@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
   Search, Clock, ExternalLink,
-  Newspaper, LayoutGrid, List, TrendingUp, TrendingDown, Minus
+  Newspaper, LayoutGrid, List, TrendingUp, TrendingDown, Minus, Loader2
 } from "lucide-react";
 import { setArticle } from "@/lib/articleStore";
 
@@ -25,10 +25,7 @@ interface Article {
 function timeAgo(d: string): string {
   if (!d) return '';
   const parsed = new Date(d);
-  if (isNaN(parsed.getTime())) {
-    const match = d.match(/(\d{1,2}\s\w{3}\s\d{4})/);
-    return match ? match[1] : d;
-  }
+  if (isNaN(parsed.getTime())) return d;
   const diff = Date.now() - parsed.getTime();
   const m = Math.floor(diff / 60000);
   if (m < 1) return 'just now';
@@ -59,13 +56,11 @@ function SentimentBadge({ sentiment }: { sentiment: string }) {
 
 function ArticleRow({ a }: { a: Article }) {
   const router = useRouter();
-
   const handleRoute = (e: React.MouseEvent) => {
     e.preventDefault();
-    setArticle(`gold_${a.id}`, a);
-    router.push(`/gold/${a.id}`);
+    setArticle(`stock_${a.id}`, a);
+    router.push(`/stocks/${a.id}`);
   };
-
   return (
     <article className="border-b border-[#e8e8e8] dark:border-white/10 last:border-0">
       <div className="py-5 flex gap-5 items-start">
@@ -80,18 +75,14 @@ function ArticleRow({ a }: { a: Article }) {
               <span className="text-[#ccc]">·</span>
               <span className="text-sm text-[#888] dark:text-gray-500 flex items-center gap-1"><Clock size={12} />{timeAgo(a.date)}</span>
               {a.sentiment && <><span className="text-[#ccc]">·</span><SentimentBadge sentiment={a.sentiment} /></>}
-              {a.currency.length > 0 && (
+              {(a.currency?.length ?? 0) > 0 && (
                 <div className="flex gap-1 flex-wrap">
-                  {a.currency.map(c => (
-                    <span key={c} className="text-xs font-black text-brand-blue bg-brand-blue/8 border border-brand-blue/15 px-1.5 py-0.5 rounded-md">{c}</span>
-                  ))}
+                  {a.currency.map(c => <span key={c} className="text-xs font-black text-brand-blue bg-brand-blue/8 border border-brand-blue/15 px-1.5 py-0.5 rounded-md">{c}</span>)}
                 </div>
               )}
-              {a.topics.length > 0 && (
+              {(a.topics?.length ?? 0) > 0 && (
                 <div className="flex gap-1 flex-wrap">
-                  {a.topics.map(t => (
-                    <span key={t} className="text-xs text-[#888] dark:text-gray-500 bg-[#f5f5f5] dark:bg-zinc-800 px-1.5 py-0.5 rounded-md border border-[#e8e8e8] dark:border-white/10">{t}</span>
-                  ))}
+                  {a.topics.map(t => <span key={t} className="text-xs text-[#888] dark:text-gray-500 bg-[#f5f5f5] dark:bg-zinc-800 px-1.5 py-0.5 rounded-md border border-[#e8e8e8] dark:border-white/10">{t}</span>)}
                 </div>
               )}
             </div>
@@ -100,10 +91,9 @@ function ArticleRow({ a }: { a: Article }) {
             </a>
           </div>
         </div>
-
         {a.image_url && (
-          <a href={a.news_url} onClick={handleRoute} className="flex-shrink-0 w-[200px] md:w-[240px] hidden sm:block" tabIndex={-1}>
-            <img src={a.image_url} alt={a.title} className="w-full h-[130px] md:h-[145px] object-cover rounded-lg border border-[#eaeaea] dark:border-white/10 hover:opacity-90 transition-opacity" />
+          <a href={a.news_url} onClick={handleRoute} className="shrink-0 w-[200px] md:w-[240px] hidden sm:block" tabIndex={-1}>
+            <img src={a.image_url} alt={a.title} className="w-full h-[130px] md:h-[145px] object-cover rounded-lg border border-brand-border dark:border-white/10 hover:opacity-90 transition-opacity" />
           </a>
         )}
       </div>
@@ -113,19 +103,17 @@ function ArticleRow({ a }: { a: Article }) {
 
 function ArticleCard({ a }: { a: Article }) {
   const router = useRouter();
-
   const handleRoute = (e: React.MouseEvent) => {
     e.preventDefault();
-    setArticle(`gold_${a.id}`, a);
-    router.push(`/gold/${a.id}`);
+    setArticle(`stock_${a.id}`, a);
+    router.push(`/stocks/${a.id}`);
   };
-
   return (
     <a href={a.news_url} onClick={handleRoute} className="group bg-white dark:bg-zinc-900 rounded-2xl border border-[#e8e8e8] dark:border-white/10 overflow-hidden hover:shadow-xl hover:shadow-brand-blue/8 hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
       {a.image_url ? (
         <div className="relative overflow-hidden h-44 bg-[#f5f5f5] dark:bg-zinc-800 shrink-0">
           <img src={a.image_url} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-          {a.currency.length > 0 && (
+          {(a.currency?.length ?? 0) > 0 && (
             <div className="absolute top-2.5 left-2.5 flex gap-1 flex-wrap">
               {a.currency.map(c => <span key={c} className="text-xs font-black text-white bg-brand-blue/90 backdrop-blur px-2 py-0.5 rounded-md">{c}</span>)}
             </div>
@@ -139,11 +127,9 @@ function ArticleCard({ a }: { a: Article }) {
       <div className="flex flex-col flex-1 p-4 gap-2">
         <h3 className="font-extrabold text-[#111] dark:text-white text-sm leading-snug line-clamp-3 group-hover:text-brand-blue transition-colors">{a.title}</h3>
         <p className="text-xs text-[#777] dark:text-gray-400 leading-relaxed line-clamp-2 flex-1">{a.text}</p>
-        {a.topics.length > 0 && (
+        {(a.topics?.length ?? 0) > 0 && (
           <div className="flex gap-1 flex-wrap">
-            {a.topics.slice(0, 3).map(t => (
-              <span key={t} className="text-xs text-[#888] dark:text-gray-500 bg-[#f5f5f5] dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-[#e8e8e8] dark:border-white/10">{t}</span>
-            ))}
+            {a.topics.slice(0, 3).map(t => <span key={t} className="text-xs text-[#888] dark:text-gray-500 bg-[#f5f5f5] dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-[#e8e8e8] dark:border-white/10">{t}</span>)}
           </div>
         )}
         <div className="flex items-center justify-between pt-2 border-t border-[#f0f0f0] dark:border-white/10 mt-1">
@@ -160,7 +146,7 @@ function ArticleCard({ a }: { a: Article }) {
 
 const PAGE_SIZE = 10;
 
-export default function Gold() {
+export default function Stocks() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -169,9 +155,9 @@ export default function Gold() {
 
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    axios.get(`${apiUrl}/gold/news`)
+    axios.get(`${apiUrl}/stocks/news`)
       .then(res => { if (res.data?.success) setArticles(res.data.articles || []); })
-      .catch(err => console.error('Failed to fetch gold news:', err?.message))
+      .catch(err => console.error('Failed to fetch stock news:', err?.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -182,8 +168,8 @@ export default function Gold() {
     return articles.filter(a =>
       a.title.toLowerCase().includes(q) ||
       a.source_name.toLowerCase().includes(q) ||
-      a.currency.some(c => c.toLowerCase().includes(q)) ||
-      a.topics.some(t => t.toLowerCase().includes(q))
+      (a.currency ?? []).some(c => c.toLowerCase().includes(q)) ||
+      (a.topics ?? []).some(t => t.toLowerCase().includes(q))
     );
   }, [query, articles]);
 
@@ -201,12 +187,12 @@ export default function Gold() {
   return (
     <div className="bg-white dark:bg-black min-h-screen font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        <h1 className="text-4xl font-extrabold text-[#111] dark:text-white mb-6 tracking-tight">Gold & Precious Metals</h1>
+        <h1 className="text-4xl font-extrabold text-[#111] dark:text-white mb-6 tracking-tight">Stocks</h1>
 
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#e8e8e8] dark:border-white/10">
           <div className="relative flex-1">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888]" />
-            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search gold news…"
+            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search stock news…"
               className="w-full pl-9 pr-4 py-2 text-sm bg-[#f7f7f7] dark:bg-zinc-900 border border-[#e0e0e0] dark:border-white/10 rounded-lg text-[#111] dark:text-white placeholder:text-[#aaa] dark:placeholder:text-gray-500 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 transition-all" />
           </div>
           {!loading && <span className="text-xs text-[#888] font-medium whitespace-nowrap hidden sm:block ml-auto">{filtered.length} article{filtered.length !== 1 ? "s" : ""}</span>}
@@ -217,34 +203,26 @@ export default function Gold() {
         </div>
 
         {loading ? (
-          <div className="space-y-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="py-5 border-b border-[#e8e8e8] dark:border-white/10 flex gap-5">
-                <div className="flex-1 space-y-3">
-                  <div className="h-7 bg-[#f0f0f0] dark:bg-zinc-800 rounded-lg animate-pulse w-4/5" />
-                  <div className="h-4 bg-[#f5f5f5] dark:bg-zinc-800 rounded animate-pulse w-3/5" />
-                  <div className="h-3 bg-[#f5f5f5] dark:bg-zinc-800 rounded animate-pulse w-2/5" />
-                </div>
-                <div className="w-[200px] h-[130px] bg-[#f0f0f0] dark:bg-zinc-800 rounded-lg animate-pulse hidden sm:block" />
-              </div>
-            ))}
+          <div className="flex items-center justify-center py-20">
+            <Loader2 size={32} className="animate-spin text-brand-blue" />
           </div>
         ) : articles.length === 0 ? (
           <div className="flex flex-col items-center py-24 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-yellow-50 dark:bg-yellow-500/10 flex items-center justify-center mb-6">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-yellow-500" stroke="currentColor" strokeWidth="1.5">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-6">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-blue-500" stroke="currentColor" strokeWidth="1.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
               </svg>
             </div>
             <h2 className="text-2xl font-extrabold text-[#111] dark:text-white mb-2">We're Getting Things Ready</h2>
             <p className="text-[#555] dark:text-gray-400 text-sm max-w-sm leading-relaxed">
-              Our gold and precious metals news feed is being set up. Live market updates and analysis will be available here shortly. Please check back soon.
+              Our stock market news feed is being set up. Live equity market updates and analysis will be available here shortly. Please check back soon.
             </p>
           </div>
         ) : paginated.length === 0 ? (
           <div className="flex flex-col items-center py-20 text-center">
             <Newspaper size={40} className="text-[#ccc] mb-3" />
             <p className="font-bold text-[#111] dark:text-white">No articles found</p>
+            <p className="text-sm text-[#888] dark:text-gray-500 mt-1">Try a different search term.</p>
           </div>
         ) : view === "list" ? (
           <div>{paginated.map(a => <ArticleRow key={a.id} a={a} />)}</div>

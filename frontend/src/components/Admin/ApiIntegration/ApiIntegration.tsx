@@ -1,241 +1,206 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '@/lib/axios';
-import { Key, Eye, EyeOff, Save, Loader2, ExternalLink, CheckCircle, Info } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/Card";
+import { Key, Eye, EyeOff, Save, Loader2, CheckCircle, Pencil } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
 import { useToast } from "@/hooks/use-toast";
 
-interface ApiKeyConfig {
+interface ApiSection {
   id: string;
-  label: string;
+  title: string;
   endpoint: string;
   placeholder: string;
-  description: string;
-  docUrl: string;
-  docLabel: string;
-  instructions: string[];
-  tag: string;
   tagColor: string;
 }
 
-const API_CONFIGS: ApiKeyConfig[] = [
-  {
-    id: "news",
-    label: "NewsAPI.ai (Event Registry)",
-    endpoint: "news-api-key",
-    placeholder: "Paste your NewsAPI.ai / Event Registry API Key…",
-    description: "Powers the Latest News section on the Home page and the /news route. Used to pull the latest global business articles.",
-    docUrl: "https://eventregistry.org/documentation",
-    docLabel: "EventRegistry Docs",
-    tag: "Home Page • News",
-    tagColor: "bg-brand-blue/10 text-brand-blue border border-brand-blue/20",
-    instructions: [
-      "1. Go to eventregistry.org and create a free account.",
-      "2. Navigate to My Profile → API Key.",
-      "3. Copy your API key and paste it below.",
-      "4. Free plan: 1 000 article requests/day.",
-    ],
-  },
+const SECTIONS: ApiSection[] = [
   {
     id: "forex",
-    label: "ExchangeRate-API (Forex)",
-    endpoint: "forex-api-key",
-    placeholder: "Paste your ExchangeRate-API key…",
-    description: "Powers the /forex page with live USD-based currency exchange rates for 160+ currencies.",
-    docUrl: "https://www.exchangerate-api.com/docs",
-    docLabel: "ExchangeRate-API Docs",
-    tag: "Forex Page",
-    tagColor: "bg-green-100 text-green-700 border border-green-200",
-    instructions: [
-      "1. Sign up free at exchangerate-api.com.",
-      "2. Copy your API key from the dashboard.",
-      "3. Free plan: 1 500 requests/month.",
-      "4. API endpoint used: GET /v6/{KEY}/latest/USD",
-    ],
-  },
-  {
-    id: "forexNews",
-    label: "MarketAux API (Forex News)",
-    endpoint: "forex-news-api-key",
-    placeholder: "Paste your MarketAux API key…",
-    description: "Powers the /forex page with real-time forex market news and analysis articles.",
-    docUrl: "https://www.marketaux.com/documentation",
-    docLabel: "MarketAux Docs",
-    tag: "Forex News",
-    tagColor: "bg-emerald-100 text-emerald-700 border border-emerald-200",
-    instructions: [
-      "1. Sign up free at marketaux.com.",
-      "2. Copy your API key from the dashboard.",
-      "3. Free plan: 100 requests/day.",
-      "4. API endpoint used: GET /v1/news/all",
-    ],
+    title: "Forex & Gold",
+    endpoint: "news-api-key",
+    placeholder: "Enter NewsAPI key…",
+    tagColor: "bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700",
   },
   {
     id: "crypto",
-    label: "CoinGecko API (Crypto)",
+    title: "Crypto",
     endpoint: "crypto-api-key",
-    placeholder: "Paste your CoinGecko Demo API key (or 'demo' for public)…",
-    description: "Powers the /crypto page with real-time cryptocurrency prices, market caps, and 24h changes for 250+ assets.",
-    docUrl: "https://www.coingecko.com/api/documentation",
-    docLabel: "CoinGecko Docs",
-    tag: "Crypto Page",
-    tagColor: "bg-purple-100 text-purple-700 border border-purple-200",
-    instructions: [
-      "1. Go to coingecko.com/api and click 'Get Demo API Key'.",
-      "2. Sign up and copy your Demo API key.",
-      "3. Demo plan: 30 calls/min, 10 000 calls/month.",
-      "4. Enter 'demo' to use the public (rate-limited) endpoint.",
-    ],
+    placeholder: "Enter CoinGecko API key…",
+    tagColor: "bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700",
   },
   {
-    id: "metals",
-    label: "Metals.live API (Gold & Precious Metals)",
-    endpoint: "metals-api-key",
-    placeholder: "Paste your Metals.live API key…",
-    description: "Powers the /gold page with live spot prices for Gold, Silver, Platinum, and Palladium.",
-    docUrl: "https://metals.live/api",
-    docLabel: "Metals.live Docs",
-    tag: "Gold Page",
-    tagColor: "bg-yellow-100 text-yellow-700 border border-yellow-200",
-    instructions: [
-      "1. Register at metals.live.",
-      "2. Copy your API key from the dashboard.",
-      "3. Free tier: 100 requests/month.",
-      "4. API endpoint used: GET /v1/spot with header X-API-KEY",
-    ],
+    id: "stocks",
+    title: "Stocks",
+    endpoint: "stocks-api-key",
+    placeholder: "Enter Stocks API key…",
+    tagColor: "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700",
   },
 ];
+
+interface ConfirmModalProps {
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmModal({ onConfirm, onCancel }: ConfirmModalProps) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4 border border-brand-border dark:border-white/10">
+        <h3 className="text-lg font-bold text-brand-black dark:text-white mb-2">Edit API Key?</h3>
+        <p className="text-brand-gray dark:text-gray-400 text-sm mb-6">
+          Are you sure you want to edit this API key? The current key will be replaced.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            className="px-5 py-2 rounded-xl border border-brand-border dark:border-white/10 text-brand-gray dark:text-gray-400 font-semibold hover:bg-brand-light dark:hover:bg-white/5 transition-colors"
+          >
+            No
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-5 py-2 rounded-xl bg-brand-blue text-white font-semibold hover:bg-brand-red transition-colors"
+          >
+            Yes, Edit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ApiIntegration() {
   const { toast } = useToast();
   const [keys, setKeys] = useState<Record<string, string>>({});
+  const [savedKeys, setSavedKeys] = useState<Record<string, string>>({});
   const [show, setShow] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState<Record<string, boolean>>({});
-  const [saved, setSaved] = useState<Record<string, boolean>>({});
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [confirmId, setConfirmId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAll = async () => {
-      const fetches = API_CONFIGS.map(async (cfg) => {
-        try {
-          const res = await axiosInstance.get(`/settings/${cfg.endpoint}`);
-          return { id: cfg.id, key: res.data?.apiKey || '' };
-        } catch {
-          return { id: cfg.id, key: '' };
-        }
-      });
-      const results = await Promise.all(fetches);
+      const results = await Promise.all(
+        SECTIONS.map(async (s) => {
+          try {
+            const res = await axiosInstance.get(`/settings/${s.endpoint}`);
+            return { id: s.id, key: res.data?.apiKey || '' };
+          } catch {
+            return { id: s.id, key: '' };
+          }
+        })
+      );
       const map: Record<string, string> = {};
       results.forEach(r => { map[r.id] = r.key; });
       setKeys(map);
+      setSavedKeys(map);
       setLoading(false);
     };
     fetchAll();
   }, []);
 
-  const handleSave = async (cfg: ApiKeyConfig) => {
-    setSaving(s => ({ ...s, [cfg.id]: true }));
+  const handleSave = async (s: ApiSection) => {
+    setSaving(v => ({ ...v, [s.id]: true }));
     try {
-      await axiosInstance.post(`/settings/${cfg.endpoint}`, { apiKey: keys[cfg.id] || '' });
-      setSaved(s => ({ ...s, [cfg.id]: true }));
-      setTimeout(() => setSaved(s => ({ ...s, [cfg.id]: false })), 3000);
-      toast({ variant: 'success' as any, description: `${cfg.label} API key saved successfully.` });
+      await axiosInstance.post(`/settings/${s.endpoint}`, { apiKey: keys[s.id] || '' });
+      setSavedKeys(v => ({ ...v, [s.id]: keys[s.id] }));
+      setEditing(v => ({ ...v, [s.id]: false }));
+      toast({ variant: 'success' as any, description: `${s.title} API key saved.` });
     } catch {
-      toast({ variant: 'destructive', description: `Failed to save ${cfg.label} API key.` });
+      toast({ variant: 'destructive', description: `Failed to save ${s.title} API key.` });
     } finally {
-      setSaving(s => ({ ...s, [cfg.id]: false }));
+      setSaving(v => ({ ...v, [s.id]: false }));
     }
   };
 
+  const isSaved = (id: string) => !!savedKeys[id] && !editing[id];
+
   if (loading) return (
-    <div className="flex items-center justify-center py-20 transition-colors duration-300">
+    <div className="flex items-center justify-center py-20">
       <Loader2 size={32} className="animate-spin text-brand-blue" />
     </div>
   );
 
   return (
     <>
+      {confirmId && (
+        <ConfirmModal
+          onConfirm={() => {
+            setEditing(v => ({ ...v, [confirmId]: true }));
+            setConfirmId(null);
+          }}
+          onCancel={() => setConfirmId(null)}
+        />
+      )}
+
       <div className="mb-10 animate-in fade-in duration-500">
         <h1 className="text-3xl md:text-4xl font-extrabold text-brand-black dark:text-white mb-2 tracking-tight">
-          API Integrations & Webhooks
+          API Integrations
         </h1>
         <p className="text-brand-gray dark:text-gray-400 text-lg">
-          Manage all third-party API keys. Each key powers a specific page on the website. All keys are stored securely in MongoDB.
+          Manage API keys for each data source. Keys are stored securely in MongoDB.
         </p>
       </div>
 
       <div className="flex flex-col gap-6">
-        {API_CONFIGS.map((cfg) => (
-          <Card key={cfg.id} className="rounded-3xl border-brand-border dark:border-white/10 shadow-sm bg-white dark:bg-zinc-900 transition-colors duration-300">
+        {SECTIONS.map((s) => (
+          <Card key={s.id} className="rounded-3xl border-brand-border dark:border-white/10 shadow-sm bg-white dark:bg-zinc-900 transition-colors duration-300">
             <CardHeader className="border-b border-brand-border dark:border-white/10 bg-brand-light/50 dark:bg-white/5 rounded-t-3xl px-8 py-6">
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <CardTitle className="flex items-center gap-2 text-xl font-bold text-brand-black dark:text-white">
-                  <Key size={22} className="text-brand-blue" /> {cfg.label}
+                  <Key size={20} className="text-brand-blue" /> {s.title}
                 </CardTitle>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${cfg.tagColor} transition-colors`}>
-                  {cfg.tag}
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${s.tagColor}`}>
+                  {s.title}
                 </span>
               </div>
-              <CardDescription className="mt-1 text-brand-gray dark:text-gray-400">{cfg.description}</CardDescription>
             </CardHeader>
 
             <CardContent className="p-8">
-              {/* Step-by-step instructions */}
-              <div className="bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/20 dark:border-brand-blue/30 rounded-2xl p-5 mb-6 transition-colors">
-                <p className="text-xs font-bold text-brand-blue uppercase tracking-widest flex items-center gap-2 mb-3">
-                  <Info size={14} /> How to get your API key
-                </p>
-                <ol className="space-y-1">
-                  {cfg.instructions.map((step, i) => (
-                    <li key={i} className="text-sm text-brand-gray dark:text-gray-400 leading-relaxed transition-colors">{step}</li>
-                  ))}
-                </ol>
-                <a
-                  href={cfg.docUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-brand-blue hover:text-brand-red transition-colors"
-                >
-                  <ExternalLink size={13} /> {cfg.docLabel}
-                </a>
-              </div>
-
-              {/* Key input + save */}
               <div className="flex flex-col md:flex-row gap-4 items-end">
-                <div className="flex-1 w-full relative">
-                  <label className="block text-xs font-bold text-brand-gray dark:text-gray-400 uppercase tracking-widest mb-2 transition-colors">
+                <div className="flex-1 w-full">
+                  <label className="block text-xs font-bold text-brand-gray dark:text-gray-400 uppercase tracking-widest mb-2">
                     API Key
                   </label>
                   <div className="relative">
                     <input
-                      type={show[cfg.id] ? "text" : "password"}
-                      value={keys[cfg.id] || ''}
-                      onChange={(e) => setKeys(k => ({ ...k, [cfg.id]: e.target.value }))}
-                      className="w-full bg-white dark:bg-zinc-800 border border-brand-border dark:border-white/10 text-brand-black dark:text-white px-4 py-3 pr-12 rounded-xl focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-medium font-mono"
-                      placeholder={cfg.placeholder}
+                      type={show[s.id] ? "text" : "password"}
+                      value={keys[s.id] || ''}
+                      onChange={(e) => setKeys(k => ({ ...k, [s.id]: e.target.value }))}
+                      disabled={isSaved(s.id)}
+                      className="w-full bg-white dark:bg-zinc-800 border border-brand-border dark:border-white/10 text-brand-black dark:text-white px-4 py-3 pr-12 rounded-xl focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                      placeholder={s.placeholder}
                     />
                     <button
-                      onClick={() => setShow(s => ({ ...s, [cfg.id]: !s[cfg.id] }))}
+                      onClick={() => setShow(v => ({ ...v, [s.id]: !v[s.id] }))}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-gray dark:text-gray-500 hover:text-brand-blue transition-colors focus:outline-none"
                     >
-                      {show[cfg.id] ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {show[s.id] ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleSave(cfg)}
-                  disabled={saving[cfg.id] || !keys[cfg.id]}
-                  className="bg-brand-blue text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-red transition-colors shadow-lg shadow-brand-blue/20 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto justify-center h-[50px]"
-                >
-                  {saving[cfg.id] ? (
-                    <Loader2 size={18} className="animate-spin" />
-                  ) : saved[cfg.id] ? (
-                    <><CheckCircle size={18} /> Saved!</>
-                  ) : (
-                    <><Save size={18} /> Save Key</>
-                  )}
-                </button>
+                {isSaved(s.id) ? (
+                  <button
+                    onClick={() => setConfirmId(s.id)}
+                    className="bg-zinc-100 dark:bg-zinc-800 text-brand-black dark:text-white border border-brand-border dark:border-white/10 px-8 py-3 rounded-xl font-bold hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-colors flex items-center gap-2 w-full md:w-auto justify-center h-[50px]"
+                  >
+                    <Pencil size={16} /> Edit Key
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleSave(s)}
+                    disabled={saving[s.id] || !keys[s.id]}
+                    className="bg-brand-blue text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-red transition-colors shadow-lg shadow-brand-blue/20 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto justify-center h-[50px]"
+                  >
+                    {saving[s.id] ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <><Save size={18} /> Save Key</>
+                    )}
+                  </button>
+                )}
               </div>
             </CardContent>
           </Card>
