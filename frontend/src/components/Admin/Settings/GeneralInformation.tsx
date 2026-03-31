@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axiosInstance from '@/lib/axios';
-import { Building2, MapPin, Phone, Mail, Save, Loader2, Info, CheckCircle2 } from 'lucide-react';
+import { Building2, MapPin, Phone, Mail, Save, Loader2, Info, CheckCircle2, ImagePlus, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/Card";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +12,7 @@ interface GeneralInfo {
   phone: string;
   email: string;
   businessHours: string;
+  logoUrl?: string;
 }
 
 const DEFAULT_INFO: GeneralInfo = {
@@ -21,6 +22,7 @@ const DEFAULT_INFO: GeneralInfo = {
   phone: '',
   email: '',
   businessHours: '',
+  logoUrl: '',
 };
 
 export default function GeneralInformation() {
@@ -28,6 +30,8 @@ export default function GeneralInformation() {
   const [info, setInfo] = useState<GeneralInfo>(DEFAULT_INFO);
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -61,6 +65,26 @@ export default function GeneralInformation() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setInfo({ ...info, [e.target.name]: e.target.value });
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      const form = new FormData();
+      form.append('logo', file);
+      const res = await axiosInstance.post('/upload/logo', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res.data.success) setInfo(prev => ({ ...prev, logoUrl: res.data.url }));
+      else toast({ variant: 'destructive', description: 'Failed to upload logo.' });
+    } catch {
+      toast({ variant: 'destructive', description: 'Failed to upload logo.' });
+    } finally {
+      setUploadingLogo(false);
+      if (logoRef.current) logoRef.current.value = '';
+    }
   };
 
   if (loading) {
@@ -159,8 +183,8 @@ export default function GeneralInformation() {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {fields.map((field, index) => (
-              <div 
-                key={field.name} 
+              <div
+                key={field.name}
                 className={`${field.fullWidth ? 'lg:col-span-2' : ''} group`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -170,13 +194,6 @@ export default function GeneralInformation() {
                   </div>
                   <span>{field.label}</span>
                 </label>
-                
-                {/* {field.description && (
-                  <p className="text-xs text-brand-gray dark:text-gray-500 mb-1.5 ml-9">
-                    {field.description}
-                  </p>
-                )} */}
-                
                 {field.textarea ? (
                   <textarea
                     name={field.name}
@@ -198,6 +215,43 @@ export default function GeneralInformation() {
                 )}
               </div>
             ))}
+
+            {/* Logo Upload */}
+            <div className="lg:col-span-2">
+              <label className="flex items-center gap-2 text-base font-semibold text-brand-black dark:text-white mb-1.5">
+                <div className="w-7 h-7 rounded-lg bg-brand-blue/10 dark:bg-brand-blue/20 flex items-center justify-center">
+                  <ImagePlus className="w-3.5 h-3.5 text-brand-blue" />
+                </div>
+                Company Logo
+              </label>
+              <div className="flex items-center gap-4">
+                {info.logoUrl ? (
+                  <div className="relative group w-24 h-24 rounded-xl border-2 border-brand-border dark:border-white/10 overflow-hidden bg-white dark:bg-zinc-800 flex items-center justify-center">
+                    <img src={info.logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                    <button type="button" onClick={() => setInfo(prev => ({ ...prev, logoUrl: '' }))}
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <div onClick={() => logoRef.current?.click()}
+                    className="w-24 h-24 rounded-xl border-2 border-dashed border-brand-border dark:border-white/10 flex flex-col items-center justify-center cursor-pointer hover:border-brand-blue hover:bg-brand-blue/5 transition-all">
+                    {uploadingLogo
+                      ? <Loader2 size={20} className="animate-spin text-brand-blue" />
+                      : <><ImagePlus size={20} className="text-brand-gray dark:text-gray-500 mb-1" /><span className="text-xs text-brand-gray dark:text-gray-500">Upload</span></>
+                    }
+                  </div>
+                )}
+                <div>
+                  <button type="button" onClick={() => logoRef.current?.click()}
+                    className="text-sm font-semibold text-brand-blue hover:text-blue-600 transition-colors">
+                    {info.logoUrl ? 'Change Logo' : 'Upload Logo'}
+                  </button>
+                  <p className="text-xs text-brand-gray dark:text-gray-500 mt-0.5">PNG, SVG, WebP — max 2MB</p>
+                </div>
+              </div>
+              <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+            </div>
           </div>
 
           {/* Save Button */}
@@ -210,15 +264,9 @@ export default function GeneralInformation() {
               <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-brand-blue opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative flex items-center gap-2">
                 {isSaving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Saving Changes...</span>
-                  </>
+                  <><Loader2 className="w-4 h-4 animate-spin" /><span>Saving Changes...</span></>
                 ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    <span>Save Information</span>
-                  </>
+                  <><Save className="w-4 h-4" /><span>Save Information</span></>
                 )}
               </div>
             </button>

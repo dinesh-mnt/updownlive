@@ -155,77 +155,62 @@ export default function ContactPage() {
   ].filter(card => card.value); // only show fields that have content
 
   return (
-    <div className="bg-brand-light dark:bg-black min-h-screen py-20 font-sans">
-      <div className="max-w-420 mx-auto px-6">
+    <div className="bg-brand-light dark:bg-black min-h-screen py-10 md:py-20 font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
         {/* Page Header */}
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red font-semibold text-sm mb-5">
+        <div className="text-center mb-10 md:mb-14">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red font-semibold text-sm mb-4 md:mb-5">
             <Send size={14} /> Get In Touch
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-brand-black dark:text-white tracking-tight mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-brand-black dark:text-white tracking-tight mb-3 md:mb-4">
             Contact <span className="text-brand-blue">Us</span>
           </h1>
-          <p className="text-lg text-brand-gray dark:text-gray-400 max-w-xl mx-auto">
+          <p className="text-base md:text-lg text-brand-gray dark:text-gray-400 max-w-xl mx-auto">
             Have questions or feedback? We'd love to hear from you.
           </p>
         </div>
 
         {/* Two-column layout */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
 
           {/* ── LEFT: Company Info Panel ── */}
-          <aside className="w-full lg:w-[480px] shrink-0 flex flex-col gap-5">
-            <div className="bg-brand-black dark:bg-zinc-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl shadow-brand-black/20 dark:shadow-black/50">
-              {/* Decorative blobs */}
+          <aside className="w-full lg:w-80 xl:w-96 shrink-0 flex flex-col gap-5">
+            <div className="bg-brand-black dark:bg-zinc-900 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-xl shadow-brand-black/20 dark:shadow-black/50">
               <div className="absolute -top-16 -right-16 w-48 h-48 bg-brand-blue rounded-full opacity-20 blur-3xl pointer-events-none" />
               <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-brand-red rounded-full opacity-20 blur-3xl pointer-events-none" />
-
               <div className="relative z-10">
-                <h2 className="text-2xl font-extrabold mb-2">
+                <h2 className="text-xl md:text-2xl font-extrabold mb-2">
                   {generalInfo.companyName || 'UpDownLive'}
                 </h2>
-                <p className="text-white/70 text-sm font-medium mb-8 leading-relaxed">
+                <p className="text-white/70 text-sm font-medium mb-6 leading-relaxed">
                   Your premier source for global market news, forex analysis, and real-time financial data.
                 </p>
-
                 {infoLoading ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className="h-14 rounded-xl bg-white/10 animate-pulse" />
-                    ))}
-                  </div>
+                  <div className="space-y-4">{[1,2,3].map(i => <div key={i} className="h-14 rounded-xl bg-white/10 animate-pulse" />)}</div>
                 ) : infoCards.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {infoCards.map((card, i) => {
                       const Icon = card.icon;
                       return (
-                        <div key={i} className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/15 transition-colors">
-                          <div className="w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-                            <Icon size={18} className="text-white" />
+                        <div key={i} className="flex items-start gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/10 hover:bg-white/15 transition-colors">
+                          <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
+                            <Icon size={16} className="text-white" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-1">
-                              {card.label}
-                            </p>
-                            <p className="text-white font-medium text-sm leading-snug whitespace-pre-line wrap-break-word">
-                              {card.value}
-                            </p>
+                            <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-0.5">{card.label}</p>
+                            <p className="text-white font-medium text-sm leading-snug wrap-break-word">{card.value}</p>
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 ) : (
-                  <p className="text-white/50 text-sm italic">
-                    Contact details not configured yet. Set them in Admin → Settings → General Information.
-                  </p>
+                  <p className="text-white/50 text-sm italic">Contact details not configured yet.</p>
                 )}
               </div>
             </div>
-
-            {/* Quick links */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-brand-border dark:border-white/10 shadow-sm">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-brand-border dark:border-white/10 shadow-sm">
               <p className="text-xs font-bold uppercase tracking-widest text-brand-gray dark:text-gray-400 mb-4">Quick Links</p>
               <div className="flex flex-col gap-2">
                 {[
@@ -234,13 +219,8 @@ export default function ContactPage() {
                   { label: 'Broker Reviews', href: '/brokers' },
                   { label: 'Economic Calendar', href: '/economic-calendar' },
                 ].map(link => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    className="flex items-center gap-2 text-sm font-semibold text-brand-gray dark:text-gray-400 hover:text-brand-blue transition-colors py-1"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0" />
-                    {link.label}
+                  <a key={link.href} href={link.href} className="flex items-center gap-2 text-sm font-semibold text-brand-gray dark:text-gray-400 hover:text-brand-blue transition-colors py-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0" />{link.label}
                   </a>
                 ))}
               </div>
@@ -248,9 +228,9 @@ export default function ContactPage() {
           </aside>
 
           {/* ── RIGHT: Contact Form ── */}
-          <div className="flex-1 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-brand-border dark:border-white/10 p-8 md:p-10">
-            <h2 className="text-2xl font-extrabold text-brand-black dark:text-white mb-1">Send Us a Message</h2>
-            <p className="text-brand-gray dark:text-gray-400 text-sm mb-8">Fill in the form below and we'll get back to you within 24 hours.</p>
+          <div className="flex-1 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-brand-border dark:border-white/10 p-5 sm:p-8 md:p-10">
+            <h2 className="text-xl md:text-2xl font-extrabold text-brand-black dark:text-white mb-1">Send Us a Message</h2>
+            <p className="text-brand-gray dark:text-gray-400 text-sm mb-6 md:mb-8">Fill in the form below and we'll get back to you within 24 hours.</p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               {/* Error Banner */}

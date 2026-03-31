@@ -20,14 +20,18 @@ import cryptoRoutes from './routes/cryptoRoutes.js';
 import stockRoutes from './routes/stockRoutes.js';
 import newsRoutes from './routes/newsRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 import economicCalendarRoutes from './routes/economicCalendarRoutes.js';
 import connectDB from './config/db.js';
+import { initAdmin } from './scripts/initAdmin.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Connect on module load — critical for Vercel cold starts
-connectDB().catch(err => console.error('Initial DB connect failed:', err.message));
+connectDB()
+  .then(() => initAdmin())
+  .catch(err => console.error('Initial DB connect failed:', err.message));
 
 // Re-ensure connection before every request (handles dropped connections)
 app.use(async (_req, _res, next) => {
@@ -81,6 +85,7 @@ app.use('/api/crypto', cryptoRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/upload', uploadRoutes);
 app.use('/api/economic-calendar', economicCalendarRoutes);
 
 app.get('/', (_req, res) => {
@@ -92,12 +97,23 @@ app.get('/', (_req, res) => {
   });
 });
 
-app.get('/health', (_req, res) => {
+app.get('/api/health', async (_req, res) => {
   const dbStatus = mongoose.connection.readyState;
   const dbStatusText = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' }[dbStatus] || 'unknown';
+  
+  let adminStatus = 'unknown';
+  try {
+    if (dbStatus === 1) {
+      const adminEmail = process.env.ADMIN_EMAIL?.replace(/"/g, '').trim();
+      const admin = await mongoose.connection.db.collection('user').findOne({ email: adminEmail, role: 'admin' });
+      adminStatus = admin ? 'exists' : 'not found';
+    }
+  } catch { adminStatus = 'check failed'; }
+
   res.json({
     status: dbStatus === 1 ? 'healthy' : 'unhealthy',
     mongoose: dbStatusText,
+    admin: adminStatus,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',

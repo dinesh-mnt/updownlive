@@ -85,12 +85,21 @@ function TradingViewChart({
   };
 
   useEffect(() => {
+    // Suppress TradingView's "contentWindow is not available" warning —
+    // it fires internally when the iframe hasn't fully mounted yet and is harmless.
+    const originalError = console.error;
+    console.error = (...args: any[]) => {
+      if (typeof args[0] === 'string' && args[0].includes('contentWindow is not available')) return;
+      originalError(...args);
+    };
+
     const timer = setTimeout(() => {
       loadWidget();
-    }, 100);
-    
+    }, 300);
+
     return () => {
       clearTimeout(timer);
+      console.error = originalError;
     };
   }, [symbol, interval, retryCount]);
 

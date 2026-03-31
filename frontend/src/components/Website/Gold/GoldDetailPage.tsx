@@ -5,8 +5,6 @@ import {
   ArrowLeft,
   Clock,
   ExternalLink,
-  Copy,
-  CheckCheck,
   Calendar,
   AlertCircle,
   Newspaper,
@@ -80,19 +78,12 @@ function SentimentBadge({ sentiment }: { sentiment: string }) {
 export default function GoldDetailPage({ id }: { id: string }) {
   const [article, setArticle] = useState<GoldArticle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const data = getArticle<GoldArticle>(`gold_${id}`);
     setArticle(data);
     setLoading(false);
   }, [id]);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   if (loading) {
     return (
@@ -174,22 +165,6 @@ export default function GoldDetailPage({ id }: { id: string }) {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={handleCopy}
-                  className="flex items-center gap-1.5 text-xs font-bold text-brand-gray dark:text-gray-400 bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 hover:border-brand-blue hover:text-brand-blue px-3 py-2 rounded-xl transition-all"
-                >
-                  {copied ? (
-                    <>
-                      <CheckCheck size={13} className="text-green-600" />
-                      <span className="text-green-600">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={13} />
-                      Copy link
-                    </>
-                  )}
-                </button>
                 {article.news_url && article.news_url !== "#" && (
                   <a
                     href={article.news_url}

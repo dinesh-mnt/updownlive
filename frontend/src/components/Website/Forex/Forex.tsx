@@ -212,6 +212,14 @@ export default function Forex({ articles: initialArticles }: ForexProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [view, setView] = useState<"list" | "grid">("list");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     if (initialArticles) return;
@@ -269,7 +277,7 @@ export default function Forex({ articles: initialArticles }: ForexProps) {
           <span className="text-xs text-[#888] font-medium whitespace-nowrap hidden sm:block ml-auto">
             {filtered.length} article{filtered.length !== 1 ? "s" : ""}
           </span>
-          <div className="flex items-center bg-[#f7f7f7] dark:bg-zinc-900 border border-[#e0e0e0] dark:border-white/10 rounded-xl p-1 gap-1 shrink-0">
+          <div className="hidden sm:flex items-center bg-[#f7f7f7] dark:bg-zinc-900 border border-[#e0e0e0] dark:border-white/10 rounded-xl p-1 gap-1 shrink-0">
             <button onClick={() => setView("list")} title="List view"
               className={`p-2 rounded-lg transition-all ${view === "list" ? "bg-brand-blue text-white shadow-sm" : "text-[#888] hover:bg-[#e8e8e8] dark:hover:bg-zinc-800"}`}>
               <List size={15} />
@@ -303,7 +311,7 @@ export default function Forex({ articles: initialArticles }: ForexProps) {
             <p className="font-bold text-[#111] dark:text-white">No articles found</p>
             <p className="text-sm text-[#888] dark:text-gray-500 mt-1">Try a different search term.</p>
           </div>
-        ) : view === "list" ? (
+        ) : view === "list" && !isMobile ? (
           <div>{paginated.map(a => <ArticleRow key={a.id} article={a} />)}</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

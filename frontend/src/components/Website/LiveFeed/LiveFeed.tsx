@@ -118,23 +118,26 @@ export default function LiveFeed() {
   const [loadingForex, setLoadingForex] = useState(true);
   const [loadingGold, setLoadingGold] = useState(true);
   const [loadingCrypto, setLoadingCrypto] = useState(true);
+  const [errorForex, setErrorForex] = useState(false);
+  const [errorGold, setErrorGold] = useState(false);
+  const [errorCrypto, setErrorCrypto] = useState(false);
 
   useEffect(() => {
     const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
     axios.get(`${api}/forex/news`)
       .then(r => { if (r.data?.success) setForexArticles(r.data.articles || []); })
-      .catch(() => {})
+      .catch(() => setErrorForex(true))
       .finally(() => setLoadingForex(false));
 
     axios.get(`${api}/gold/news`)
       .then(r => { if (r.data?.success) setGoldArticles(r.data.articles || []); })
-      .catch(() => {})
+      .catch(() => setErrorGold(true))
       .finally(() => setLoadingGold(false));
 
     axios.get(`${api}/crypto/news`)
       .then(r => { if (r.data?.success) setCryptoArticles(r.data.articles || []); })
-      .catch(() => {})
+      .catch(() => setErrorCrypto(true))
       .finally(() => setLoadingCrypto(false));
   }, []);
 
@@ -142,6 +145,20 @@ export default function LiveFeed() {
     <div className="bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 rounded-2xl p-12 text-center">
       <Newspaper size={48} className="mx-auto text-gray-300 dark:text-gray-700 mb-4" />
       <p className="text-brand-gray dark:text-gray-400">No articles available at the moment.</p>
+    </div>
+  );
+
+  const ComingSoon = () => (
+    <div className="bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 rounded-2xl p-10 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-5">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400 dark:text-gray-500">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-extrabold text-brand-black dark:text-white mb-2">We're Getting Things Ready</h3>
+      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto leading-relaxed">
+        This feed is being set up. Live market updates will be available here shortly. Please check back soon.
+      </p>
     </div>
   );
 
@@ -177,7 +194,7 @@ export default function LiveFeed() {
               <p className="text-brand-gray dark:text-gray-400 text-sm mt-1">Latest news and analysis from the foreign exchange market.</p>
             </div>
           </div>
-          {loadingForex ? <Spinner /> : forexArticles.length > 0 ? (
+          {loadingForex ? <Spinner /> : errorForex ? <ComingSoon /> : forexArticles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {forexArticles.slice(0, 12).map(a => <NewsCard key={a.id} article={a} prefix="forex" tagColor="bg-brand-blue/90" />)}
             </div>
@@ -194,7 +211,7 @@ export default function LiveFeed() {
               <p className="text-brand-gray dark:text-gray-400 text-sm mt-1">Latest updates on gold, silver, platinum, and precious metals markets.</p>
             </div>
           </div>
-          {loadingGold ? <Spinner color="border-yellow-500" /> : goldArticles.length > 0 ? (
+          {loadingGold ? <Spinner color="border-yellow-500" /> : errorGold ? <ComingSoon /> : goldArticles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {goldArticles.slice(0, 12).map(a => <NewsCard key={a.id} article={a} prefix="gold" tagColor="bg-yellow-500/90" />)}
             </div>
@@ -211,7 +228,7 @@ export default function LiveFeed() {
               <p className="text-brand-gray dark:text-gray-400 text-sm mt-1">Latest updates on Bitcoin, Ethereum, and the broader crypto market.</p>
             </div>
           </div>
-          {loadingCrypto ? <Spinner color="border-indigo-500" /> : cryptoArticles.length > 0 ? (
+          {loadingCrypto ? <Spinner color="border-indigo-500" /> : errorCrypto ? <ComingSoon /> : cryptoArticles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {cryptoArticles.slice(0, 12).map(a => <NewsCard key={a.id} article={a} prefix="crypto" tagColor="bg-indigo-500/90" />)}
             </div>

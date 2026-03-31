@@ -45,9 +45,12 @@ export default function UserManagement() {
             toast({
                 title: 'Status Updated',
                 description: `User account has been ${status === 'approved' ? 'approved' : 'rejected'}.`,
+                className: 'bg-green-100 border-green-200 text-green-800',
             });
+            // Update local state so modal reflects new status immediately
+            setSelectedUser((prev: any) => prev ? { ...prev, verifiedStatus: status } : prev);
+            setUsers(prev => prev.map(u => (u._id === userId || u.id === userId) ? { ...u, verifiedStatus: status } : u));
             setIsModalOpen(false);
-            fetchUsers();
         } catch (error) {
             console.error('Error updating status:', error);
             toast({
@@ -152,7 +155,7 @@ export default function UserManagement() {
                                                     {user.verifiedStatus || 'pending'}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="px-8 py-5 text-right">
+                                            <TableCell className="px-8 py-5">
                                                 <Button 
                                                     variant="ghost" 
                                                     size="sm"
@@ -262,31 +265,43 @@ export default function UserManagement() {
                             </div>
 
                             <div className="flex gap-4">
-                                <Button 
-                                    className="flex-1 bg-green-500 hover:bg-green-600 text-white font-black py-8 rounded-2xl shadow-xl shadow-green-500/20 transition-all active:scale-95 group"
-                                    onClick={() => handleUpdateStatus(selectedUser.id || selectedUser._id, 'approved')}
-                                    disabled={isUpdating}
-                                >
-                                    {isUpdating ? <Loader2 className="animate-spin" /> : (
-                                        <div className="flex flex-col items-center">
-                                            <CheckCircle size={24} className="mb-1 group-hover:scale-110 transition-transform" />
-                                            <span>APPROVE ACCOUNT</span>
-                                        </div>
-                                    )}
-                                </Button>
-                                <Button 
-                                    variant="destructive"
-                                    className="flex-1 font-black py-8 rounded-2xl shadow-xl shadow-brand-red/20 transition-all active:scale-95 group"
-                                    onClick={() => handleUpdateStatus(selectedUser.id || selectedUser._id, 'rejected')}
-                                    disabled={isUpdating}
-                                >
-                                    {isUpdating ? <Loader2 className="animate-spin" /> : (
-                                        <div className="flex flex-col items-center">
-                                            <XCircle size={24} className="mb-1 group-hover:scale-110 transition-transform" />
-                                            <span>REJECT ACCOUNT</span>
-                                        </div>
-                                    )}
-                                </Button>
+                                {selectedUser.verifiedStatus === 'approved' ? (
+                                    <div className="flex-1 flex items-center justify-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-black py-5 rounded-2xl border border-green-200 dark:border-green-700">
+                                        <CheckCircle size={20} /> Already Approved
+                                    </div>
+                                ) : (
+                                    <Button 
+                                        className="flex-1 bg-green-500 hover:bg-green-600 text-white font-black py-8 rounded-2xl shadow-xl shadow-green-500/20 transition-all active:scale-95 group"
+                                        onClick={() => handleUpdateStatus(selectedUser.id || selectedUser._id, 'approved')}
+                                        disabled={isUpdating}
+                                    >
+                                        {isUpdating ? <Loader2 className="animate-spin" /> : (
+                                            <div className="flex flex-col items-center">
+                                                <CheckCircle size={24} className="mb-1 group-hover:scale-110 transition-transform" />
+                                                <span>APPROVE ACCOUNT</span>
+                                            </div>
+                                        )}
+                                    </Button>
+                                )}
+                                {selectedUser.verifiedStatus === 'rejected' ? (
+                                    <div className="flex-1 flex items-center justify-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-black py-5 rounded-2xl border border-red-200 dark:border-red-700">
+                                        <XCircle size={20} /> Already Rejected
+                                    </div>
+                                ) : (
+                                    <Button 
+                                        variant="destructive"
+                                        className="flex-1 font-black py-8 rounded-2xl shadow-xl shadow-brand-red/20 transition-all active:scale-95 group"
+                                        onClick={() => handleUpdateStatus(selectedUser.id || selectedUser._id, 'rejected')}
+                                        disabled={isUpdating}
+                                    >
+                                        {isUpdating ? <Loader2 className="animate-spin" /> : (
+                                            <div className="flex flex-col items-center">
+                                                <XCircle size={24} className="mb-1 group-hover:scale-110 transition-transform" />
+                                                <span>REJECT ACCOUNT</span>
+                                            </div>
+                                        )}
+                                    </Button>
+                                )}
                             </div>
                             
                             <p className="text-center mt-6 text-[10px] font-bold text-brand-gray uppercase tracking-widest">

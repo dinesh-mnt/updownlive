@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft, Clock, ExternalLink, Copy, CheckCheck,
+  ArrowLeft, Clock, ExternalLink,
   Calendar, AlertCircle, TrendingUp, TrendingDown, Minus
 } from "lucide-react";
 import { getArticle } from "@/lib/articleStore";
@@ -64,19 +64,12 @@ function SentimentBadge({ sentiment }: { sentiment: string }) {
 export default function ForexDetailPage({ id }: { id: string }) {
   const [article, setArticle] = useState<ForexArticle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const data = getArticle<ForexArticle>(`forex_${id}`);
     setArticle(data);
     setLoading(false);
   }, [id]);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   if (loading) {
     return (
@@ -136,9 +129,6 @@ export default function ForexDetailPage({ id }: { id: string }) {
                 <div className="flex items-center gap-1.5"><Clock size={13} />{timeAgo(article.date)}</div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={handleCopy} className="flex items-center gap-1.5 text-xs font-bold text-brand-gray dark:text-gray-400 bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 hover:border-brand-blue hover:text-brand-blue px-3 py-2 rounded-xl transition-all">
-                  {copied ? <><CheckCheck size={13} className="text-green-600" /><span className="text-green-600">Copied!</span></> : <><Copy size={13} />Copy link</>}
-                </button>
                 {article.news_url && article.news_url !== "#" && (
                   <a href={article.news_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-white bg-brand-blue hover:bg-blue-600 px-3 py-2 rounded-xl transition-all">
                     <ExternalLink size={13} /> Source

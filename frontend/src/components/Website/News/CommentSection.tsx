@@ -49,9 +49,17 @@ export default function CommentSection({ articleUrl, articleTitle }: Props) {
     setSubmitting(true);
     setError('');
     try {
+      const token = typeof window !== 'undefined'
+        ? (localStorage.getItem('userToken') || sessionStorage.getItem('userToken') ||
+           localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken'))
+        : null;
+
       const res = await fetch('/api/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ articleUrl, articleTitle, content }),
       });
       const data = await res.json();

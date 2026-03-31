@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Search, MonitorPlay, Home, User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
 import { useAuth, signOut } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -208,23 +208,12 @@ export default function Navbar() {
             </div>
           )}
           
-          <div className="mb-6">
-            <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-gray dark:text-gray-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-brand-border dark:border-white/10 bg-brand-light dark:bg-white/5 text-brand-black dark:text-white placeholder:text-brand-gray dark:placeholder:text-gray-400 outline-none focus:border-brand-blue transition-all font-medium text-sm"
-              />
-            </div>
-          </div>
-          
           <div className="flex flex-col gap-1">
-            <Link href="/" className="flex items-center gap-3 py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
-              <Home size={20} /> Home
+            <Link href="/" className="py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
+              Home
             </Link>
-            <Link href="/live-feed" className="flex items-center gap-3 py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
-              <MonitorPlay size={20} /> Live Feed
+            <Link href="/live-feed" className="py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
+              Live Feed
             </Link>
             {['Economic Calendar', 'Forex', 'Gold', 'Crypto', 'Stocks', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => (
                <Link key={item} href={`/${item.toLowerCase().replace(/\s+/g, '-')}`} className="py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>

@@ -2,7 +2,12 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 export const protect = async (req, res, next) => {
-  const token = req.cookies.jwt;
+  let token = req.cookies.jwt;
+
+  // Also accept Bearer token from Authorization header (needed for cross-domain on Vercel)
+  if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
 
   if (!token) {
     return res.status(401).json({ message: 'Not authorized, no token' });

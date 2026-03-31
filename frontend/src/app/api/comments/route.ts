@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/api$/, '');
+const BACKEND_URL = (
+  process.env.BACKEND_URL ||
+  process.env.API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:5000/api'
+).replace(/\/api$/, '');
 
 export async function GET(request: NextRequest) {
   const articleUrl = request.nextUrl.searchParams.get('articleUrl');
@@ -19,6 +24,7 @@ export async function POST(request: NextRequest) {
     headers: {
       'Content-Type': 'application/json',
       cookie: request.headers.get('cookie') || '',
+      ...(request.headers.get('authorization') ? { authorization: request.headers.get('authorization')! } : {}),
     },
     body: JSON.stringify(body),
     cache: 'no-store',

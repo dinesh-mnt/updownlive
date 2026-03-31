@@ -60,17 +60,17 @@ export default function StatsSection() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(6,66,240,0.04),transparent_50%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(198,54,52,0.04),transparent_50%)] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Section header */}
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0642f0]/10 border border-[#0642f0]/20 text-[#0642f0] font-semibold text-sm mb-5">
+        <div className="text-center mb-8 md:mb-14">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0642f0]/10 border border-[#0642f0]/20 text-[#0642f0] font-semibold text-sm mb-4 md:mb-5">
             <Shield size={15} /> Why UpDownLive?
           </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-[#111111] dark:text-white tracking-tight mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#111111] dark:text-white tracking-tight mb-3 md:mb-4">
             Everything You Need to
             <span className="text-[#0642f0]"> Trade Smarter</span>
           </h2>
-          <p className="text-lg text-[#333333] dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-[#333333] dark:text-gray-400 max-w-2xl mx-auto">
             One platform. All the tools, data, and news you need to make informed financial decisions.
           </p>
         </div>

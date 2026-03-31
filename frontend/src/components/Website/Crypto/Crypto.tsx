@@ -100,7 +100,7 @@ function ArticleRow({ a }: { a: Article }) {
 
         {a.image_url && (
           <a href={a.news_url} onClick={handleRoute} className="shrink-0 w-[200px] md:w-[240px] hidden sm:block" tabIndex={-1}>
-            <img src={a.image_url} alt={a.title} className="w-full h-[130px] md:h-[145px] object-cover rounded-lg border border-[#eaeaea] dark:border-white/10 hover:opacity-90 transition-opacity" />
+            <img src={a.image_url} alt={a.title} className="w-full h-[130px] md:h-[145px] object-cover rounded-lg border border-brand-border dark:border-white/10 hover:opacity-90 transition-opacity" />
           </a>
         )}
       </div>
@@ -163,12 +163,20 @@ export default function Crypto() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [view, setView] = useState<"list" | "grid">("list");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     axios.get(`${apiUrl}/crypto/news`)
       .then(res => { if (res.data?.success) setArticles(res.data.articles || []); })
-      .catch(err => console.error('Failed to fetch crypto news:', err?.message))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
@@ -207,7 +215,7 @@ export default function Crypto() {
               className="w-full pl-9 pr-4 py-2 text-sm bg-[#f7f7f7] dark:bg-zinc-900 border border-[#e0e0e0] dark:border-white/10 rounded-lg text-[#111] dark:text-white placeholder:text-[#aaa] dark:placeholder:text-gray-500 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 transition-all" />
           </div>
           {!loading && <span className="text-xs text-[#888] font-medium whitespace-nowrap hidden sm:block ml-auto">{filtered.length} article{filtered.length !== 1 ? "s" : ""}</span>}
-          <div className="flex items-center bg-[#f7f7f7] dark:bg-zinc-900 border border-[#e0e0e0] dark:border-white/10 rounded-xl p-1 gap-1 shrink-0">
+          <div className="hidden sm:flex items-center bg-[#f7f7f7] dark:bg-zinc-900 border border-[#e0e0e0] dark:border-white/10 rounded-xl p-1 gap-1 shrink-0">
             <button onClick={() => setView("list")} title="List view" className={`p-2 rounded-lg transition-all ${view === "list" ? "bg-brand-blue text-white shadow-sm" : "text-[#888] dark:text-gray-400 hover:bg-[#e8e8e8] dark:hover:bg-zinc-800"}`}><List size={15} /></button>
             <button onClick={() => setView("grid")} title="Grid view" className={`p-2 rounded-lg transition-all ${view === "grid" ? "bg-brand-blue text-white shadow-sm" : "text-[#888] dark:text-gray-400 hover:bg-[#e8e8e8] dark:hover:bg-zinc-800"}`}><LayoutGrid size={15} /></button>
           </div>
@@ -243,7 +251,7 @@ export default function Crypto() {
             <Newspaper size={40} className="text-[#ccc] mb-3" />
             <p className="font-bold text-[#111] dark:text-white">No articles found</p>
           </div>
-        ) : view === "list" ? (
+        ) : view === "list" && !isMobile ? (
           <div>{paginated.map(a => <ArticleRow key={a.id} a={a} />)}</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">{paginated.map(a => <ArticleCard key={a.id} a={a} />)}</div>

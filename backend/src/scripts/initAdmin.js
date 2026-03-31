@@ -1,43 +1,43 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, '../../../.env') });
 
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import connectDB from '../config/db.js';
 
-async function initAdmin() {
-  await connectDB();
-
-  const adminEmail = process.env.ADMIN_EMAIL?.replace(/"/g, '');
-  const adminPassword = process.env.ADMIN_PASSWORD?.replace(/"/g, '');
+export async function initAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL?.replace(/"/g, '').trim();
+  const adminPassword = process.env.ADMIN_PASSWORD?.replace(/"/g, '').trim();
 
   if (!adminEmail || !adminPassword) {
-    console.error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in .env');
-    process.exit(1);
+    console.warn('⚠️  ADMIN_EMAIL or ADMIN_PASSWORD not set — skipping admin init');
+    return;
   }
 
   try {
-    const existing = await User.findOne({ email: adminEmail });
+    await connectDB();
+    const existing = await User.findOne({ email: adminEmail }).select('+password');
 
     if (existing) {
-      if (existing.role !== 'admin') {
-        existing.role = 'admin';
-        await existing.save();
-        console.log('Updated existing user to admin:', adminEmail);
-      } else {
-        console.log('Admin already exists:', adminEmail);
-      }
+      // Always sync password + role from .env so login always works
+      existing.password = adminPassword; // pre-save hook will hash it
+      existing.role = 'admin';
+      await existing.save();
+      console.log(`✅ Admin synced: ${adminEmail}`);
     } else {
       await User.create({ name: 'Admin', email: adminEmail, password: adminPassword, role: 'admin' });
-      console.log('Admin user created:', adminEmail);
+      console.log(`✅ Admin created: ${adminEmail}`);
     }
   } catch (error) {
-    console.error('Error initializing admin:', error);
-    process.exit(1);
-  } finally {
-    await mongoose.disconnect();
+    console.error('❌ Admin init error:', error.message);
   }
 }
 
-initAdmin();
+// Allow running directly: node src/scripts/initAdmin.js
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  initAdmin().then(() => mongoose.disconnect());
+}

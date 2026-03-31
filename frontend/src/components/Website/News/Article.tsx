@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Calendar, PenTool, Newspaper } from 'lucide-react';
 import CommentSection from './CommentSection';
@@ -18,8 +17,7 @@ interface Article {
   source: string;
 }
 
-export default function ArticlePage() {
-  const { id } = useParams() as { id: string };
+export default function ArticlePage({ id }: { id: string }) {
   const [article, setArticle] = useState<Article | null>(null);
   const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -117,22 +115,14 @@ export default function ArticlePage() {
               </div>
             )}
 
-            {/* Full article CTA — NewsAPI only provides a preview, full content is on the source */}
-            <div className="rounded-2xl border-2 border-dashed border-brand-blue/30 dark:border-brand-blue/20 bg-brand-blue/5 dark:bg-brand-blue/10 p-8 mb-12 text-center">
-              <Newspaper size={36} className="mx-auto text-brand-blue mb-4 opacity-70" />
-              <h4 className="text-lg font-bold text-brand-black dark:text-white mb-2">
-                This is a preview — full article is on the source
-              </h4>
-              <p className="text-brand-gray dark:text-gray-400 text-sm mb-6">
-                News providers limit preview content. Click below to read the complete article on the original site.
-              </p>
+            <div className="mb-8">
               <a
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-brand-blue text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors shadow-lg"
+                className="inline-flex items-center gap-2 bg-brand-blue text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-600 transition-colors shadow-lg"
               >
-                Read Full Article <ExternalLink size={18} />
+                Read Full Article <ExternalLink size={15} />
               </a>
             </div>
 
