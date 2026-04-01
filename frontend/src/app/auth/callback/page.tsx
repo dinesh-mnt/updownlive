@@ -1,21 +1,28 @@
 "use client";
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
+import { invalidateSession } from '@/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const { user, isPending } = useAuth();
 
   useEffect(() => {
-    if (isPending) return;
-    if (user) {
-      window.location.href = user.role === 'admin' ? '/admin/dashboard' : '/';
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const role = params.get('role');
+
+    if (token) {
+      // Store token for cross-domain Bearer auth
+      localStorage.setItem('userToken', token);
+      invalidateSession();
+      window.location.href = role === 'admin' ? '/admin/dashboard' : '/';
     } else {
+      // Fallback: rely on cookie-based session
+      invalidateSession();
       router.push('/admin/login');
     }
-  }, [user, isPending, router]);
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 font-outfit bg-linear-to-br from-brand-blue/5 to-brand-red/5">

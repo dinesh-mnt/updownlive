@@ -41,6 +41,9 @@ export default function RegisterPage() {
     if (password.length < 8) { setError("Password must be at least 8 characters"); setLoading(false); return; }
     try {
       const { data } = await axiosInstance.post("/auth/register", { name: name.trim(), email: email.trim(), password });
+      if (data.token) {
+        localStorage.setItem('userToken', data.token);
+      }
       invalidateSession();
       window.location.href = data.role === "admin" ? "/admin/dashboard" : "/";
     } catch (err: any) {

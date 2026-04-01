@@ -22,6 +22,7 @@ const setCookieAndRespond = (res, user, statusCode = 200) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    token, // include token so frontend can store it for cross-domain auth
   });
 };
 
@@ -220,7 +221,8 @@ export const googleCallback = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect(`${frontendUrl}/auth/callback`);
+    // Pass token as query param so the frontend can store it in localStorage for cross-domain auth
+    res.redirect(`${frontendUrl}/auth/callback?token=${token}&role=${user.role}`);
   } catch (error) {
     console.error('Google OAuth error:', error.response?.data || error.message);
     res.redirect(`${frontendUrl}/admin/login?error=oauth_failed`);

@@ -46,6 +46,10 @@ export default function LoginPage() {
     if (!password.trim()) { setError("Password is required"); setLoading(false); return; }
     try {
       const { data } = await axiosInstance.post("/auth/login", { email: email.trim(), password });
+      // Store token for cross-domain auth (production)
+      if (data.token) {
+        localStorage.setItem('userToken', data.token);
+      }
       invalidateSession();
       window.location.href = data.role === "admin" ? "/admin/dashboard" : "/";
     } catch (err: any) {

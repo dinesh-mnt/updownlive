@@ -88,6 +88,8 @@ export function useAuth(): AuthState & { refetch: () => void } {
 
 export async function signOut() {
   await axiosInstance.post('/auth/logout').catch(() => {});
+  localStorage.removeItem('userToken');
+  localStorage.removeItem('adminToken');
   cachedUser = null;
   hasFetched = false;
   notify();

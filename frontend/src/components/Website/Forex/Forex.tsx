@@ -223,8 +223,7 @@ export default function Forex({ articles: initialArticles }: ForexProps) {
 
   useEffect(() => {
     if (initialArticles) return;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    axios.get(`${apiUrl}/forex/news`)
+    axios.get('/api/forex-news')
       .then(res => { if (res.data?.success) setArticles(res.data.articles || []); })
       .catch(err => console.error('Failed to fetch forex news:', err?.message))
       .finally(() => setLoading(false));

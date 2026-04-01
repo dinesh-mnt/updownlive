@@ -3,10 +3,16 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 
 const isBrowser = typeof window !== 'undefined';
 
 // Create axios instance with base configuration
+// In the browser, route auth calls through Next.js API proxy so cookies stay same-domain.
+// On the server (SSR), call the backend directly.
+const baseURL = isBrowser
+  ? '/api'
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
+
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
-  timeout: 30000, // 30 seconds — increased to handle larger payloads (e.g. base64 images)
-  withCredentials: true, // Always send httpOnly cookies (enables 7-day admin sessions)
+  baseURL,
+  timeout: 30000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
