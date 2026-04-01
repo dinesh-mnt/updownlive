@@ -90,7 +90,78 @@ html:not(.dark) body {
   color: #111111;
 }
 
-/* ── react-phone-number-input overrides ── */
+/* ── react-international-phone overrides ── */
+.phone-field-wrapper .react-international-phone-input-container {
+  display: flex !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.phone-field-wrapper .react-international-phone-country-selector-button {
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid rgba(156,163,175,0.2) !important;
+  border-radius: 0 !important;
+  padding: 0 12px !important;
+  height: auto !important;
+}
+.dark .phone-field-wrapper .react-international-phone-country-selector-button {
+  border-right-color: rgba(255,255,255,0.1) !important;
+}
+.phone-field-wrapper .react-international-phone-country-selector-button:hover {
+  background: rgba(0,0,0,0.04) !important;
+}
+.dark .phone-field-wrapper .react-international-phone-country-selector-button:hover {
+  background: rgba(255,255,255,0.05) !important;
+}
+.phone-field-wrapper .react-international-phone-input {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 14px 20px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: inherit !important;
+  outline: none !important;
+}
+.dark .phone-field-wrapper .react-international-phone-input {
+  color: #fff !important;
+}
+.phone-field-wrapper .react-international-phone-input::placeholder {
+  color: rgba(107,114,128,0.5) !important;
+}
+/* Dropdown */
+.phone-field-wrapper .react-international-phone-country-selector-dropdown {
+  background: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12) !important;
+  z-index: 50 !important;
+}
+.dark .phone-field-wrapper .react-international-phone-country-selector-dropdown {
+  background: #27272a !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+.phone-field-wrapper .react-international-phone-country-selector-dropdown__list-item {
+  color: #111 !important;
+}
+.dark .phone-field-wrapper .react-international-phone-country-selector-dropdown__list-item {
+  color: #fff !important;
+}
+.phone-field-wrapper .react-international-phone-country-selector-dropdown__list-item:hover {
+  background: rgba(6,66,240,0.08) !important;
+}
+.dark .phone-field-wrapper .react-international-phone-country-selector-dropdown__list-item:hover {
+  background: rgba(255,255,255,0.05) !important;
+}
+.phone-field-wrapper .react-international-phone-country-selector-dropdown__list-item--selected {
+  background: rgba(6,66,240,0.1) !important;
+  color: #0642f0 !important;
+}
 .phone-input-wrapper {
   @apply w-full;
 }
@@ -114,4 +185,41 @@ html:not(.dark) body {
 }
 .phone-input-error .PhoneInput {
   @apply border-red-400 ring-2 ring-red-400/20;
+}
+
+/* Phone input inside inputClass wrapper div */
+.PhoneInput {
+  @apply flex items-center gap-2 w-full px-4 py-0;
+}
+.PhoneInputCountry {
+  @apply flex items-center gap-1 shrink-0 pl-1;
+}
+.PhoneInputCountrySelect {
+  @apply bg-transparent text-brand-black dark:text-white font-medium text-sm outline-none cursor-pointer;
+}
+.PhoneInputCountrySelect option {
+  @apply bg-white dark:bg-zinc-800 text-brand-black dark:text-white;
+}
+.PhoneInputInput {
+  @apply flex-1 bg-transparent text-brand-black dark:text-white font-medium text-sm outline-none placeholder:text-brand-gray/50 dark:placeholder:text-gray-500 py-3.5 pr-2;
+}
+
+/* Force dark background on the native country select dropdown in dark mode */
+.dark .PhoneInputCountrySelect {
+  background-color: #27272a;
+  color: #fff;
+  color-scheme: dark;
+}
+.dark .PhoneInputCountrySelect option {
+  background-color: #27272a;
+  color: #fff;
+}
+.dark .phone-input-wrapper .PhoneInputCountrySelect {
+  background-color: #27272a;
+  color: #fff;
+  color-scheme: dark;
+}
+.dark .phone-input-wrapper .PhoneInputCountrySelect option {
+  background-color: #27272a;
+  color: #fff;
 }

@@ -28,6 +28,7 @@
     "react-country-region-selector": "^4.0.6",
     "react-date-range": "^2.0.1",
     "react-dom": "19.2.3",
+    "react-international-phone": "^4.8.0",
     "react-phone-number-input": "^3.4.16",
     "react-select": "^5.10.2",
     "react-timezone-select": "^3.3.2",

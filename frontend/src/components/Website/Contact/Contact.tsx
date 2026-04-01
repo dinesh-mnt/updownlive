@@ -1,12 +1,132 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axiosInstance from '@/lib/axios';
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
 import {
   Send, Check, AlertCircle,
-  Building2, MapPin, Phone, Mail, Clock, Globe
+  Building2, MapPin, Phone, Mail, Clock, Globe, ChevronDown, Search
 } from 'lucide-react';
+
+const COUNTRIES = [
+  { code: '+91', iso: 'in', name: 'India' },
+  { code: '+1', iso: 'us', name: 'United States' },
+  { code: '+1', iso: 'ca', name: 'Canada' },
+  { code: '+44', iso: 'gb', name: 'United Kingdom' },
+  { code: '+61', iso: 'au', name: 'Australia' },
+  { code: '+49', iso: 'de', name: 'Germany' },
+  { code: '+33', iso: 'fr', name: 'France' },
+  { code: '+81', iso: 'jp', name: 'Japan' },
+  { code: '+86', iso: 'cn', name: 'China' },
+  { code: '+971', iso: 'ae', name: 'UAE' },
+  { code: '+65', iso: 'sg', name: 'Singapore' },
+  { code: '+60', iso: 'my', name: 'Malaysia' },
+  { code: '+55', iso: 'br', name: 'Brazil' },
+  { code: '+27', iso: 'za', name: 'South Africa' },
+  { code: '+234', iso: 'ng', name: 'Nigeria' },
+  { code: '+254', iso: 'ke', name: 'Kenya' },
+  { code: '+966', iso: 'sa', name: 'Saudi Arabia' },
+  { code: '+92', iso: 'pk', name: 'Pakistan' },
+  { code: '+880', iso: 'bd', name: 'Bangladesh' },
+  { code: '+94', iso: 'lk', name: 'Sri Lanka' },
+  { code: '+20', iso: 'eg', name: 'Egypt' },
+  { code: '+62', iso: 'id', name: 'Indonesia' },
+  { code: '+82', iso: 'kr', name: 'South Korea' },
+  { code: '+52', iso: 'mx', name: 'Mexico' },
+  { code: '+31', iso: 'nl', name: 'Netherlands' },
+];
+
+function FlagImg({ iso }: { iso: string }) {
+  return (
+    <img
+      src={`https://flagcdn.com/w20/${iso}.png`}
+      srcSet={`https://flagcdn.com/w40/${iso}.png 2x`}
+      width={20}
+      height={15}
+      alt={iso}
+      className="rounded-sm object-cover shrink-0"
+    />
+  );
+}
+
+function PhoneCountrySelect({
+  selected, onSelect,
+}: {
+  selected: typeof COUNTRIES[0];
+  onSelect: (c: typeof COUNTRIES[0]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = COUNTRIES.filter(c =>
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
+    c.code.includes(search)
+  );
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative shrink-0 self-stretch">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-2 px-3 h-full text-sm font-medium text-brand-black dark:text-white border-r border-brand-gray/20 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+      >
+        <FlagImg iso={selected.iso} />
+        <span className="text-xs text-brand-gray dark:text-gray-400 font-semibold">{selected.code}</span>
+        <ChevronDown size={12} className={`text-brand-gray dark:text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-[calc(100%+4px)] z-50 w-60 bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 rounded-xl shadow-2xl overflow-hidden">
+          {/* Search */}
+          <div className="p-2 border-b border-brand-border dark:border-white/10">
+            <div className="flex items-center gap-2 px-3 py-2 bg-brand-light dark:bg-zinc-800 rounded-lg">
+              <Search size={13} className="text-brand-gray dark:text-gray-400 shrink-0" />
+              <input
+                autoFocus
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search country..."
+                className="flex-1 bg-transparent text-sm text-brand-black dark:text-white outline-none placeholder:text-brand-gray/50 dark:placeholder:text-gray-500"
+              />
+            </div>
+          </div>
+          {/* List */}
+          <div className="max-h-52 overflow-y-auto">
+            {filtered.length === 0 ? (
+              <p className="text-center text-xs text-brand-gray dark:text-gray-500 py-4">No results</p>
+            ) : filtered.map((c, i) => (
+              <button
+                key={`${c.iso}-${i}`}
+                type="button"
+                onClick={() => { onSelect(c); setOpen(false); setSearch(''); }}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors text-left ${
+                  c.iso === selected.iso
+                    ? 'bg-brand-blue/10 dark:bg-brand-blue/20 text-brand-blue'
+                    : 'text-brand-black dark:text-white hover:bg-brand-light dark:hover:bg-white/5'
+                }`}
+              >
+                <FlagImg iso={c.iso} />
+                <span className="flex-1 font-medium">{c.name}</span>
+                <span className="text-xs text-brand-gray dark:text-gray-400">{c.code}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface GeneralInfo {
   companyName?: string;
@@ -38,15 +158,10 @@ export default function ContactPage() {
 
   // ── Form ──
   const [formData, setFormData] = useState({
-    department: 'Support',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '' as string | undefined,
-    companyName: '',
-    message: '',
-    agreedToTerms: false,
+    department: 'Support', firstName: '', lastName: '', email: '',
+    phone: '', companyName: '', message: '', agreedToTerms: false,
   });
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   const [phoneError, setPhoneError] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -66,31 +181,20 @@ export default function ContactPage() {
       return;
     }
 
-    // Validate phone if provided
-    if (formData.phone && !isValidPhoneNumber(formData.phone)) {
-      setPhoneError('Please enter a valid phone number.');
-      return;
-    }
     setPhoneError('');
-    
     setStatus('loading');
     setErrorMessage('');
     
     try {
-      const response = await axiosInstance.post(`/enquiries`, formData);
+      const response = await axiosInstance.post(`/enquiries`, {
+        ...formData,
+        phone: formData.phone ? `${selectedCountry.code} ${formData.phone}` : '',
+      });
       
       console.log('Enquiry response:', response.data);
       setStatus('success');
-      setFormData({
-        department: 'Support',
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        companyName: '',
-        message: '',
-        agreedToTerms: false,
-      });
+      setFormData({ department: 'Support', firstName: '', lastName: '', email: '', phone: '', companyName: '', message: '', agreedToTerms: false });
+      setSelectedCountry(COUNTRIES[0]);
       setPhoneError('');
     } catch (err: any) {
       console.error('Enquiry submission error:', err);
@@ -295,17 +399,17 @@ export default function ContactPage() {
               {/* Phone & Company */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="phone" className="text-sm font-semibold text-brand-black dark:text-white">Phone</label>
-                  <PhoneInput
-                    international
-                    defaultCountry="IN"
-                    value={formData.phone}
-                    onChange={(val) => {
-                      setFormData({ ...formData, phone: val });
-                      if (phoneError) setPhoneError('');
-                    }}
-                    className={`phone-input-wrapper ${phoneError ? 'phone-input-error' : ''}`}
-                  />
+                  <label className="text-sm font-semibold text-brand-black dark:text-white">Phone</label>
+                  <div className="flex items-stretch w-full bg-brand-light dark:bg-zinc-800 border border-transparent dark:border-white/5 rounded-lg focus-within:bg-white dark:focus-within:bg-zinc-900 focus-within:border-brand-blue focus-within:ring-2 focus-within:ring-brand-blue/20 transition-all overflow-visible">
+                    <PhoneCountrySelect selected={selectedCountry} onSelect={setSelectedCountry} />
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={e => { setFormData(p => ({ ...p, phone: e.target.value })); if (phoneError) setPhoneError(''); }}
+                      placeholder="Phone number"
+                      className="flex-1 bg-transparent text-brand-black dark:text-white text-sm font-medium px-4 py-3.5 outline-none placeholder:text-brand-gray/50 dark:placeholder:text-gray-500"
+                    />
+                  </div>
                   {phoneError && (
                     <p className="text-xs text-red-500 flex items-center gap-1 mt-0.5">
                       <AlertCircle size={12} /> {phoneError}
