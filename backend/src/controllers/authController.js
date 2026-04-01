@@ -102,7 +102,12 @@ export const logoutUser = (req, res) => {
 // @access  Public (returns null user if not logged in)
 export const getSession = async (req, res) => {
   try {
-    const token = req.cookies.jwt;
+    // Accept token from cookie OR Authorization header (for cross-domain production)
+    let token = req.cookies.jwt;
+    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
     if (!token) {
       return res.json({ user: null });
     }
@@ -124,7 +129,6 @@ export const getSession = async (req, res) => {
       },
     });
   } catch (error) {
-    // Invalid/expired token — treat as no session
     res.json({ user: null });
   }
 };
