@@ -60,8 +60,8 @@ export default function Navbar() {
           >
             Live Feed
           </Link>
-          {['Economic Calendar', 'Forex', 'Gold', 'Crypto', 'Stocks', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => {
-            const href = `/${item.toLowerCase().replace(/\s+/g, '-')}`;
+          {['Economic Calendar', 'Forex', 'Gold/Oil', 'Crypto', 'Stocks', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => {
+            const href = item === 'Gold/Oil' ? '/gold' : `/${item.toLowerCase().replace(/\s+/g, '-')}`;
             return (
               <Link 
                 key={item}
@@ -215,11 +215,14 @@ export default function Navbar() {
             <Link href="/live-feed" className="py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
               Live Feed
             </Link>
-            {['Economic Calendar', 'Forex', 'Gold', 'Crypto', 'Stocks', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => (
-               <Link key={item} href={`/${item.toLowerCase().replace(/\s+/g, '-')}`} className="py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
-                 {item}
-               </Link>
-            ))}
+            {['Economic Calendar', 'Forex', 'Gold/Oil', 'Crypto', 'Stocks', 'Charts', 'Brokers', 'About Us', 'Contact Us'].map((item) => {
+              const href = item === 'Gold/Oil' ? '/gold' : `/${item.toLowerCase().replace(/\s+/g, '-')}`;
+              return (
+                <Link key={item} href={href} className="py-4 border-b border-brand-border dark:border-white/10 font-semibold text-brand-black dark:text-white" onClick={() => setIsMenuOpen(false)}>
+                  {item}
+                </Link>
+              );
+            })}
           </div>
 
           {!user ? (

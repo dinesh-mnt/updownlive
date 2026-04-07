@@ -176,10 +176,9 @@ export default function Gold() {
   }, []);
 
   useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    axios.get(`${apiUrl}/gold/news`)
+    axios.get('/api/forex-news')
       .then(res => { if (res.data?.success) setArticles(res.data.articles || []); })
-      .catch(err => console.error('Failed to fetch gold news:', err?.message))
+      .catch(err => console.error('Failed to fetch gold/oil news:', err?.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -209,12 +208,12 @@ export default function Gold() {
   return (
     <div className="bg-white dark:bg-black min-h-screen font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        <h1 className="text-4xl font-extrabold text-[#111] dark:text-white mb-6 tracking-tight">Gold & Precious Metals</h1>
+        <h1 className="text-4xl font-extrabold text-[#111] dark:text-white mb-6 tracking-tight">Gold/Oil</h1>
 
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#e8e8e8] dark:border-white/10">
           <div className="relative flex-1">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888]" />
-            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search gold news…"
+            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search gold/oil news…"
               className="w-full pl-9 pr-4 py-2 text-sm bg-[#f7f7f7] dark:bg-zinc-900 border border-[#e0e0e0] dark:border-white/10 rounded-lg text-[#111] dark:text-white placeholder:text-[#aaa] dark:placeholder:text-gray-500 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 transition-all" />
           </div>
           {!loading && <span className="text-xs text-[#888] font-medium whitespace-nowrap hidden sm:block ml-auto">{filtered.length} article{filtered.length !== 1 ? "s" : ""}</span>}
@@ -246,7 +245,7 @@ export default function Gold() {
             </div>
             <h2 className="text-2xl font-extrabold text-[#111] dark:text-white mb-2">We're Getting Things Ready</h2>
             <p className="text-[#555] dark:text-gray-400 text-sm max-w-sm leading-relaxed">
-              Our gold and precious metals news feed is being set up. Live market updates and analysis will be available here shortly. Please check back soon.
+              Our gold and oil news feed is being set up. Live market updates and analysis will be available here shortly. Please check back soon.
             </p>
           </div>
         ) : paginated.length === 0 ? (

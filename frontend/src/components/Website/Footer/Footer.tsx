@@ -62,7 +62,7 @@ export default function Footer() {
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
               {[
                 ['/', 'Home'], ['/live-feed', 'Live Feed'], ['/economic-calendar', 'Economic Calendar'],
-                ['/forex', 'Forex'], ['/gold', 'Gold'], ['/crypto', 'Crypto'],
+                ['/forex', 'Forex'], ['/gold', 'Gold/Oil'], ['/crypto', 'Crypto'],
                 ['/stocks', 'Stocks'], ['/charts', 'Charts'], ['/brokers', 'Brokers'],
                 ['/about-us', 'About Us'], ['/contact-us', 'Contact Us'],
               ].map(([href, label]) => (

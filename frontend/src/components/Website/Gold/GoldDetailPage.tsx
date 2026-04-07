@@ -108,7 +108,7 @@ export default function GoldDetailPage({ id }: { id: string }) {
             href="/gold"
             className="inline-flex items-center gap-2 bg-brand-blue text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors"
           >
-            <ArrowLeft size={16} /> Back to Gold
+            <ArrowLeft size={16} /> Back to Gold/Oil
           </Link>
         </div>
       </div>

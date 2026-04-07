@@ -8,7 +8,9 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "build": "echo 'No build step required'",
-    "init-admin": "node src/scripts/initAdmin.js"
+    "init-admin": "node src/scripts/initAdmin.js",
+    "test-email": "node src/scripts/testEmail.js",
+    "test-welcome-email": "node src/scripts/testWelcomeEmail.js"
   },
   "dependencies": {
     "axios": "^1.13.6",

@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { sendEmail } from '../config/emailService.js';
+import { generateWelcomeEmail, generateWelcomeEmailText } from '../templates/welcomeEmail.js';
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'secret123', {
@@ -38,14 +39,18 @@ export const registerUser = async (req, res) => {
     const user = await User.create({ name, email, password });
 
     if (user) {
+      // Send professional welcome email
       try {
         await sendEmail({
           to: email,
-          subject: 'Welcome to UpDownLive Global Market Portal',
-          text: `Hi ${name},\n\nWelcome to UpDownLive! Your registration was successful.\n\nBest Regards,\nUpDownLive Team`,
+          subject: '🎉 Welcome to UpDownLive - Your Market Journey Starts Here!',
+          text: generateWelcomeEmailText(name),
+          html: generateWelcomeEmail(name),
         });
+        console.log(`Welcome email sent successfully to ${email}`);
       } catch (emailError) {
-        console.error('Email send failed:', emailError);
+        console.error('Failed to send welcome email:', emailError.message);
+        // Don't fail registration if email fails
       }
       setCookieAndRespond(res, user, 201);
     } else {
@@ -198,6 +203,7 @@ export const googleCallback = async (req, res) => {
 
     // Find or create user
     let user = await User.findOne({ email });
+    let isNewUser = false;
 
     if (!user) {
       const adminEmail = process.env.ADMIN_EMAIL?.replace(/"/g, '');
@@ -208,6 +214,22 @@ export const googleCallback = async (req, res) => {
         password: Math.random().toString(36) + Math.random().toString(36),
         role,
       });
+      isNewUser = true;
+
+      // Send welcome email for new Google OAuth users
+      if (role !== 'admin') {
+        try {
+          await sendEmail({
+            to: email,
+            subject: '🎉 Welcome to UpDownLive - Your Market Journey Starts Here!',
+            text: generateWelcomeEmailText(name),
+            html: generateWelcomeEmail(name),
+          });
+          console.log(`Welcome email sent successfully to ${email} (Google OAuth)`);
+        } catch (emailError) {
+          console.error('Failed to send welcome email:', emailError.message);
+        }
+      }
     }
 
     // Ensure admin email always has admin role

@@ -130,7 +130,7 @@ export default function LiveFeed() {
       .catch(() => setErrorForex(true))
       .finally(() => setLoadingForex(false));
 
-    axios.get(`${api}/gold/news`)
+    axios.get(`${api}/forex/news`)
       .then(r => { if (r.data?.success) setGoldArticles(r.data.articles || []); })
       .catch(() => setErrorGold(true))
       .finally(() => setLoadingGold(false));
@@ -174,7 +174,7 @@ export default function LiveFeed() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 space-y-4 md:space-y-0 border-b border-brand-border dark:border-white/10 pb-8">
         <div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-brand-black dark:text-white tracking-tight">Live Feeds</h1>
-          <p className="text-brand-gray dark:text-gray-400 mt-3 text-lg">Real-time market news across Forex, Gold, and Crypto.</p>
+          <p className="text-brand-gray dark:text-gray-400 mt-3 text-lg">Real-time market news across Forex, Gold/Oil, and Crypto.</p>
         </div>
         <div className="flex items-center gap-3 text-sm font-medium text-brand-gray dark:text-gray-400 bg-white dark:bg-zinc-900 border border-brand-border dark:border-white/10 px-5 py-2.5 rounded-xl shadow-sm">
           <Clock size={16} className="text-brand-blue" />
@@ -207,8 +207,8 @@ export default function LiveFeed() {
               <span className="text-2xl">🪙</span>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-brand-black dark:text-white">Gold & Precious Metals News</h2>
-              <p className="text-brand-gray dark:text-gray-400 text-sm mt-1">Latest updates on gold, silver, platinum, and precious metals markets.</p>
+              <h2 className="text-2xl font-bold text-brand-black dark:text-white">Gold/Oil News</h2>
+              <p className="text-brand-gray dark:text-gray-400 text-sm mt-1">Latest updates on gold, oil, and commodity markets.</p>
             </div>
           </div>
           {loadingGold ? <Spinner color="border-yellow-500" /> : errorGold ? <ComingSoon /> : goldArticles.length > 0 ? (
